@@ -1,0 +1,5 @@
+{
+  "title": "Angular Form Inspector",
+  "language": "TS",
+  "code": "public findInvalidControls(form: any) {\n    const invalid = [];\n    const controls = form.controls;\n    for (const name in controls) {\n        if (controls[name].invalid) {\n            invalid.push(name);\n        }\n    }\n    return invalid;\n}"
+}

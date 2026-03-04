@@ -41,10 +41,11 @@ async function switchUtility(utilityId, element) {
 
   // Update top bar
   const utilityNames = {
-    "in-generator": "🗄️ SQL IN Statement Generator",
-    "code-blocks": "📝 Frequently Used Code Blocks",
+    "in-generator":
+      "<i class='fas fa-database'></i> SQL IN Statement Generator",
+    "code-blocks": "<i class='fas fa-code'></i> Frequently Used Code Blocks",
   };
-  document.getElementById("utilityName").textContent = utilityNames[utilityId];
+  document.getElementById("utilityName").innerHTML = utilityNames[utilityId];
 
   // Render code blocks if viewing code blocks
   if (utilityId === "code-blocks") {
@@ -59,6 +60,7 @@ const codeBlockFiles = [
   "ngrok.json",
   "migration-patnav.json",
   "migration-user.json",
+  "angular-form-inspector.json",
 ];
 
 let codeBlocks = [];
@@ -92,24 +94,29 @@ async function renderCodeBlocks() {
 
   if (codeBlocks.length === 0) {
     container.innerHTML =
-      '<div style="padding: 40px; text-align: center; color: #999;">No code blocks loaded</div>';
+      '<div class="col-12"><div class="alert alert-info text-center">No code blocks loaded</div></div>';
     return;
   }
 
   codeBlocks.forEach((block, index) => {
     const card = document.createElement("div");
-    card.className = "code-block-card";
     card.innerHTML = `
-      <div class="code-block-header">
-        <div class="code-block-title">${block.title}</div>
-        <span class="code-block-badge">${block.language}</span>
-      </div>
-      <div class="code-block-content">
-        <div class="code-preview">${escapeHtml(block.code)}</div>
-      </div>
-      <div class="code-block-footer">
-        <button class="code-copy-btn" onclick="copyCodeBlock(${index})">Copy</button>
-        <span class="code-copy-feedback" id="codeFeedback${index}">✓ Copied!</span>
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+          <div>
+            <div class="card-title mb-2 text-dark fw-bold" style="font-size: 14px">${block.title}</div>
+            <span class="badge bg-primary">${block.language}</span>
+          </div>
+          <button class="btn btn-outline-primary btn-sm" onclick="copyCodeBlock(${index})" title="Copy to clipboard">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+        <div class="card-body p-3">
+          <div class="code-preview">${escapeHtml(block.code)}</div>
+        </div>
+        <div class="card-footer bg-light border-top">
+          <span class="code-copy-feedback" id="codeFeedback${index}"><i class="fas fa-check text-success"></i> Copied!</span>
+        </div>
       </div>
     `;
     container.appendChild(card);
