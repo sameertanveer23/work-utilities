@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Utilities</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f5f5f5;
+        color: #333;
+        display: flex;
+        height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 250px;
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 20px 0;
+        overflow-y: auto;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar-header {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid #34495e;
+        margin-bottom: 20px;
+      }
+
+      .sidebar-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #3498db;
+      }
+
+      .category {
+        margin-bottom: 5px;
+      }
+
+      .category-toggle {
+        width: 100%;
+        padding: 12px 20px;
+        background: none;
+        border: none;
+        color: #ecf0f1;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background 0.2s;
+      }
+
+      .category-toggle:hover {
+        background: rgba(52, 152, 219, 0.1);
+      }
+
+      .category-toggle.active {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+      }
+
+      .category-arrow {
+        font-size: 12px;
+        transition: transform 0.3s;
+      }
+
+      .category-arrow.open {
+        transform: rotate(90deg);
+      }
+
+      .utilities-list {
+        display: none;
+        padding: 5px 0;
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .utilities-list.open {
+        display: block;
+      }
+
+      .utility-item {
+        padding: 10px 40px;
+        color: #bdc3c7;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+      }
+
+      .utility-item:hover {
+        background: rgba(52, 152, 219, 0.15);
+        color: #3498db;
+        border-left-color: #3498db;
+      }
+
+      .utility-item.active {
+        background: rgba(52, 152, 219, 0.25);
+        color: #3498db;
+        border-left-color: #3498db;
+        font-weight: 600;
+      }
+
+      /* Main Content */
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+      }
+
+      .top-bar {
+        background: #fff;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .utility-name {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+      }
+
+      .content-area {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+      }
+
+      .utility-view {
+        display: none;
+      }
+
+      .utility-view.active {
+        display: block;
+      }
+
+      /* Welcome Screen */
+      .welcome-screen {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: #999;
+        height: 100%;
+      }
+
+      .welcome-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+      }
+
+      .welcome-text {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      /* Form Styles */
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+      }
+
+      input[type="text"],
+      textarea,
+      select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: inherit;
+        transition: border 0.2s;
+      }
+
+      input[type="text"]:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 200px;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 13px;
+      }
+
+      button {
+        padding: 10px 20px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: background 0.2s;
+        margin-right: 10px;
+      }
+
+      button:hover {
+        background: #2980b9;
+      }
+
+      button.secondary {
+        background: #95a5a6;
+      }
+
+      button.secondary:hover {
+        background: #7f8c8d;
+      }
+
+      /* Utility Container */
+      .utility-container {
+        max-width: 1000px;
+      }
+
+      .input-output-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 20px;
+      }
+
+      .section {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 5px;
+        border: 1px solid #e0e0e0;
+      }
+
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 15px;
+      }
+
+      .stat-box {
+        background: #ecf0f1;
+        padding: 12px;
+        border-radius: 5px;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #3498db;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: #7f8c8d;
+        margin-top: 5px;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .copy-feedback {
+        color: #27ae60;
+        font-size: 12px;
+        font-weight: 600;
+        display: none;
+        margin-left: 10px;
+      }
+
+      .copy-feedback.show {
+        display: inline;
+      }
+
+      /* Code Blocks */
+      .code-blocks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+      }
+
+      .code-block-card {
+        background: #f9f9f9;
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+
+      .code-block-header {
+        background: #f0f0f0;
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .code-block-title {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .code-block-badge {
+        display: inline-block;
+        background: #3498db;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .code-block-content {
+        padding: 15px;
+      }
+
+      .code-preview {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 12px;
+        border-radius: 3px;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 12px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      .code-block-footer {
+        padding: 12px 15px;
+        border-top: 1px solid #e0e0e0;
+        background: #fafafa;
+        display: flex;
+        gap: 8px;
+      }
+
+      .code-copy-btn {
+        flex: 1;
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      .code-copy-feedback {
+        color: #27ae60;
+        font-size: 11px;
+        font-weight: 600;
+        display: none;
+        align-self: center;
+      }
+
+      .code-copy-feedback.show {
+        display: inline;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+          max-height: 200px;
+          display: flex;
+          overflow-x: auto;
+        }
+
+        .input-output-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .code-blocks-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .category {
+          flex-shrink: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">⚙️ Utilities</div>
+      </div>
+
+      <!-- SQL Category -->
+      <div class="category">
+        <button class="category-toggle" onclick="toggleCategory(this)">
+          🗄️ SQL
+          <span class="category-arrow">›</span>
+        </button>
+        <div class="utilities-list">
+          <div
+            class="utility-item"
+            onclick="switchUtility('in-generator', this)"
+            style="cursor: pointer"
+          >
+            IN Statement Generator
+          </div>
+        </div>
+      </div>
+
+      <!-- .NET Category -->
+      <div class="category">
+        <button class="category-toggle" onclick="toggleCategory(this)">
+          🔷 .NET
+          <span class="category-arrow">›</span>
+        </button>
+        <div class="utilities-list">
+          <div class="utility-item">Coming Soon</div>
+        </div>
+      </div>
+
+      <!-- Angular Category -->
+      <div class="category">
+        <button class="category-toggle" onclick="toggleCategory(this)">
+          ⚡ Angular
+          <span class="category-arrow">›</span>
+        </button>
+        <div class="utilities-list">
+          <div class="utility-item">Coming Soon</div>
+        </div>
+      </div>
+
+      <!-- General Category -->
+      <div class="category">
+        <button class="category-toggle" onclick="toggleCategory(this)">
+          ✨ General
+          <span class="category-arrow">›</span>
+        </button>
+        <div class="utilities-list">
+          <div class="utility-item">Coming Soon</div>
+        </div>
+      </div>
+
+      <!-- Code Blocks Category -->
+      <div class="category">
+        <button class="category-toggle" onclick="toggleCategory(this)">
+          📝 Code Blocks
+          <span class="category-arrow">›</span>
+        </button>
+        <div class="utilities-list">
+          <div
+            class="utility-item"
+            onclick="switchUtility('code-blocks', this)"
+          >
+            Frequently Used
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <div class="top-bar">
+        <div class="utility-name" id="utilityName">Select a Utility</div>
+        <div style="color: #999; font-size: 12px">
+          Utilities by Sameertanveer23
+        </div>
+      </div>
+
+      <div class="content-area">
+        <!-- Welcome Screen -->
+        <div class="utility-view active" id="welcome">
+          <div class="welcome-screen">
+            <div class="welcome-icon">⚙️</div>
+            <div class="welcome-text">
+              Select a utility from the sidebar to get started
+            </div>
+          </div>
+        </div>
+
+        <!-- Frequently Used Code Blocks -->
+        <div class="utility-view" id="code-blocks">
+          <div class="utility-container">
+            <div class="code-blocks-grid" id="codeBlocksContainer">
+              <!-- Code blocks will be generated here by JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- SQL IN Generator -->
+        <div class="utility-view" id="in-generator">
+          <div class="utility-container">
+            <div class="input-output-grid">
+              <div class="section">
+                <div class="section-title">Input</div>
+                <div class="form-group">
+                  <label>Table Name</label>
+                  <input type="text" id="tableName" placeholder="e.g., Users" />
+                </div>
+                <div class="form-group">
+                  <label>Column Name</label>
+                  <input
+                    type="text"
+                    id="columnName"
+                    placeholder="e.g., UserId"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>ID Format</label>
+                  <select id="idFormat">
+                    <option value="single-quote">Single Quote</option>
+                    <option value="double-quote">Double Quote</option>
+                    <option value="no-quote">No Quote</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>IDs (one per line)</label>
+                  <textarea
+                    id="rawIds"
+                    placeholder="Paste your IDs here, one per line..."
+                  ></textarea>
+                </div>
+                <div class="button-group">
+                  <button onclick="generateInQuery()">Generate Query</button>
+                  <button class="secondary" onclick="clearInInputs()">
+                    Clear
+                  </button>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-title">Output</div>
+                <div class="form-group">
+                  <label>Generated Query</label>
+                  <textarea id="outputQuery" readonly></textarea>
+                </div>
+                <div class="button-group">
+                  <button onclick="copyInQuery()">Copy to Clipboard</button>
+                  <button class="secondary" onclick="downloadInQuery()">
+                    Download
+                  </button>
+                  <span class="copy-feedback" id="copyFeedback">✓ Copied!</span>
+                </div>
+                <div class="stats" id="stats" style="display: none">
+                  <div class="stat-box">
+                    <div class="stat-value" id="idCount">0</div>
+                    <div class="stat-label">Total IDs</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="stat-value" id="charCount">0</div>
+                    <div class="stat-label">Characters</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

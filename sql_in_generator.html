@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SQL Utility – IN Statement Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 16px;
+    }
+
+    .sidebar h2 {
+      font-size: 14px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .menu-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #1e293b;
+    }
+
+    .menu-item.active {
+      background: #2563eb;
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+      font-family: Consolas, monospace;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+
+    button.secondary {
+      background: #334155;
+    }
+
+    .output textarea {
+      background: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Utilities</h2>
+    <div class="menu-item active">IN Statements</div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <h1>SQL IN Statement Generator</h1>
+
+    <div class="field">
+      <label for="tableName">Table Name</label>
+      <input type="text" id="tableName" placeholder="e.g. Studies" />
+    </div>
+
+    <div class="field">
+      <label for="rawIds">Raw IDs (one per line)</label>
+      <textarea id="rawIds" placeholder="Paste IDs from DB here..."></textarea>
+    </div>
+
+    <div class="field">
+      <button onclick="generateQuery()">Generate Query</button>
+      <button class="secondary" onclick="copyQuery()">Copy</button>
+    </div>
+
+    <div class="field output">
+      <label for="outputQuery">Generated SQL</label>
+      <textarea id="outputQuery" readonly></textarea>
+    </div>
+  </div>
+
+  <script>
+    function generateQuery() {
+      const table = document.getElementById("tableName").value.trim();
+      const raw = document.getElementById("rawIds").value;
+
+      if (!table || !raw) {
+        alert("Table name and IDs are required.");
+        return;
+      }
+
+      const ids = raw
+        .split(/\r?\n/)
+        .map(x => x.trim())
+        .filter(x => x.length > 0);
+
+      if (ids.length === 0) {
+        alert("No valid IDs found.");
+        return;
+      }
+
+      const inBlock = ids
+        .map(id => `'${id}'`)
+        .join(",\n");
+
+      const query =
+`SELECT *
+FROM ${table}
+WHERE StudyId IN (
+${inBlock}
+);`;
+
+      document.getElementById("outputQuery").value = query;
+    }
+
+    function copyQuery() {
+      const output = document.getElementById("outputQuery");
+      if (!output.value) return;
+
+      output.select();
+      document.execCommand("copy");
+    }
+  </script>
+
+</body>
+</html>

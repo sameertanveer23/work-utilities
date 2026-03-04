@@ -1,0 +1,5 @@
+{
+  "title": "Study Patient",
+  "language": "SQL",
+  "code": "SELECT StudyId, MedicalRecordId, ss.Name\n FROM [patnav].[Studys] s\n Join [patnav].Patients p on s.PatientId = p.PatientId\n Join [patnav].StudyStates ss on ss.Id = s.StudyStateId;"
+}

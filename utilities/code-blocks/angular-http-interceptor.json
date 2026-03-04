@@ -1,0 +1,5 @@
+{
+  "title": "Angular HttpClient with Interceptor",
+  "language": "TypeScript",
+  "code": "@Injectable()\nexport class ApiInterceptor implements HttpInterceptor {\n  intercept(req: HttpRequest<any>, next: HttpHandler) {\n    const cloned = req.clone({\n      headers: req.headers.set('Authorization', 'Bearer token')\n    });\n    return next.handle(cloned);\n  }\n}"
+}
