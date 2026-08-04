@@ -97,7 +97,8 @@ body {
 // `[matButtonIcon]` gets projected into the icon slot but no margin, so our
 // <app-icon> ends up glued to the label. Mirror Material's own rules, reading
 // the same theme tokens so spacing stays consistent if the theme changes.
-.mat-mdc-button-base > app-icon[matButtonIcon] {
+.mat-mdc-button-base:not(.mat-mdc-icon-button) > app-icon,
+.mat-mdc-button-base:not(.mat-mdc-icon-button) .mdc-button__label > app-icon {
   // inline-flex rather than Material's inline-block: the glyph is a font
   // character, and centring it in the box is more reliable than baseline
   // alignment across the different button heights.
@@ -112,29 +113,12 @@ body {
   width: 1.125rem;
 }
 
-.mat-mdc-button > app-icon[matButtonIcon] {
-  margin-right: var(--mat-button-text-icon-spacing, 8px);
-  margin-left: var(--mat-button-text-icon-offset, -4px);
-}
-
-.mat-mdc-unelevated-button > app-icon[matButtonIcon] {
-  margin-right: var(--mat-button-filled-icon-spacing, 8px);
-  margin-left: var(--mat-button-filled-icon-offset, -8px);
-}
-
-.mat-mdc-outlined-button > app-icon[matButtonIcon] {
-  margin-right: var(--mat-button-outlined-icon-spacing, 8px);
-  margin-left: var(--mat-button-outlined-icon-offset, -8px);
-}
-
-.mat-tonal-button > app-icon[matButtonIcon] {
-  margin-right: var(--mat-button-tonal-icon-spacing, 8px);
-  margin-left: var(--mat-button-tonal-icon-offset, -8px);
-}
-
-.mat-mdc-raised-button > app-icon[matButtonIcon] {
-  margin-right: var(--mat-button-protected-icon-spacing, 8px);
-  margin-left: var(--mat-button-protected-icon-offset, -8px);
+// Space the icon off the label. Covers both possible placements: the dedicated
+// icon slot (direct child of the button) and the default slot (inside
+// .mdc-button__label), so this holds even if the projection selector changes.
+.mat-mdc-button-base:not(.mat-mdc-icon-button) > app-icon,
+.mat-mdc-button-base:not(.mat-mdc-icon-button) .mdc-button__label > app-icon:first-child {
+  margin-right: 8px;
 }
 
 // Icon-only buttons project into the default slot and need the glyph centred
