@@ -44,6 +44,8 @@ async function switchUtility(utilityId, element) {
     "in-generator":
       "<i class='fas fa-database'></i> SQL IN Statement Generator",
     "code-blocks": "<i class='fas fa-code'></i> Frequently Used Code Blocks",
+    "branch-name-generator":
+      "<i class='fas fa-code-branch'></i> Branch Name Generator",
   };
   document.getElementById("utilityName").innerHTML = utilityNames[utilityId];
 
@@ -250,12 +252,105 @@ function clearInInputs() {
   document.getElementById("stats").style.display = "none";
 }
 
+// Branch Name Generator Functions
+function slugifyBranchTitle(title) {
+  return title
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/['\u2018\u2019]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function generateBranchName() {
+  const prefix = document.getElementById("branchPrefix").value;
+  const card = document.getElementById("cardNumber").value.trim();
+  const title = document.getElementById("cardTitle").value.trim();
+  const output = document.getElementById("outputBranchName");
+  const stats = document.getElementById("branchStats");
+
+  const cardPart = card
+    .toUpperCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^A-Z0-9-]/g, "")
+    .replace(/^-+|-+$/g, "");
+  const titlePart = slugifyBranchTitle(title);
+
+  const branch = prefix + [cardPart, titlePart].filter((x) => x).join("-");
+
+  if (!branch) {
+    output.value = "";
+    stats.style.display = "none";
+    return;
+  }
+
+  output.value = branch;
+  document.getElementById("branchWordCount").textContent = titlePart
+    ? titlePart.split("-").length
+    : 0;
+  document.getElementById("branchCharCount").textContent = branch.length;
+  stats.style.display = "grid";
+}
+
+function copyBranchText(text) {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      showBranchCopyFeedback();
+    })
+    .catch(() => {
+      const output = document.getElementById("outputBranchName");
+      const original = output.value;
+      output.value = text;
+      output.select();
+      document.execCommand("copy");
+      output.value = original;
+      showBranchCopyFeedback();
+    });
+}
+
+function copyBranchName() {
+  const branch = document.getElementById("outputBranchName").value;
+  if (!branch) {
+    alert("Nothing to copy");
+    return;
+  }
+  copyBranchText(branch);
+}
+
+function copyCheckoutCommand() {
+  const branch = document.getElementById("outputBranchName").value;
+  if (!branch) {
+    alert("Nothing to copy");
+    return;
+  }
+  copyBranchText(`git checkout -b ${branch}`);
+}
+
+function showBranchCopyFeedback() {
+  const feedback = document.getElementById("branchCopyFeedback");
+  feedback.classList.add("show");
+  setTimeout(() => feedback.classList.remove("show"), 2000);
+}
+
+function clearBranchInputs() {
+  document.getElementById("cardNumber").value = "";
+  document.getElementById("cardTitle").value = "";
+  document.getElementById("branchPrefix").value = "";
+  document.getElementById("outputBranchName").value = "";
+  document.getElementById("branchStats").style.display = "none";
+}
+
 // Keyboard shortcut
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.key === "Enter") {
     const activeView = document.querySelector(".utility-view.active");
-    if (activeView && activeView.id === "in-generator") {
+    if (!activeView) return;
+    if (activeView.id === "in-generator") {
       generateInQuery();
+    } else if (activeView.id === "branch-name-generator") {
+      generateBranchName();
     }
   }
 });
