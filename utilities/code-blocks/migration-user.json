@@ -1,5 +1,0 @@
-{
-  "title": "Migration User",
-  "language": "C#",
-  "code": "$env:UserSchemaName = \"user\"\nAdd-Migration MIRATIONNAME -Context UserDataContext -OutputDir User\\Data\\Migrations"
-}
