@@ -26,6 +26,7 @@ npm test         # unit tests
 | **Branch Name Generator** | Card number + title → a clean git branch name, plus the `git checkout -b` command. |
 | **JSON Formatter** | Pretty-print, minify and validate, with line/column error positions. |
 | **Encode / Decode** | Base64 (standard and URL-safe), URL, and HTML entities, both directions. |
+| **Base64 ↔ File** | Decode base64 to a PDF, TIFF, image or document with a live preview, or encode a file. Format is detected from magic bytes. |
 | **Timestamp Converter** | Unix epoch ↔ ISO 8601 ↔ UTC ↔ local, with a relative label. |
 | **Frequently Used Code Blocks** | Your saved snippets, searchable and one click from the clipboard. |
 

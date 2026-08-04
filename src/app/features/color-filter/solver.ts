@@ -25,7 +25,14 @@ export type SolutionQuality = 'perfect' | 'close' | 'off' | 'bad';
 export interface FilterSolution {
   /** The six raw percentages, in the order the filter chain applies them. */
   readonly values: readonly number[];
+  /** Optimiser score. Includes HSL terms, so it reads high for near-greys. */
   readonly loss: number;
+  /**
+   * Largest per-channel difference (0-255) between the target and what the
+   * emitted CSS actually renders. This is the number that reflects what you
+   * see, so it - not `loss` - drives `quality`.
+   */
+  readonly maxChannelDelta: number;
   readonly quality: SolutionQuality;
   /** `brightness(0) saturate(100%) invert(...) ...` */
   readonly raw: string;
@@ -51,19 +58,29 @@ interface SpsaResult {
  * left a visibly-off colour on the screen. Taking the best of several runs
  * costs a few milliseconds and lands on a near-perfect match almost every time.
  */
-export function solve(target: Color, attempts = 8, rng: Rng = Math.random): FilterSolution {
-  let best: SpsaResult | null = null;
+export function solve(target: Color, attempts = 12, rng: Rng = Math.random): FilterSolution {
+  let bestValues: number[] | null = null;
+  let bestLoss = Infinity;
 
   for (let i = 0; i < Math.max(1, attempts); i++) {
     const wide = solveWide(target, rng);
     const result = solveNarrow(target, wide, rng);
-    if (best === null || result.loss < best.loss) best = result;
+
+    // Score the *rounded* parameters, not the solver's raw floats. We emit
+    // integers, and with saturate running to 7500% the rounding is enough to
+    // shift the rendered colour - selecting on the float loss can pick a
+    // solution that reports "perfect" but renders visibly off.
+    const loss = lossOf(target, effectiveValues(result.values));
+    if (loss < bestLoss) {
+      bestLoss = loss;
+      bestValues = result.values;
+    }
 
     // Already exact; more attempts cannot improve on this meaningfully.
-    if (best.loss < 0.1) break;
+    if (bestLoss < 0.1) break;
   }
 
-  return describe(best!);
+  return describe({ values: bestValues!, loss: bestLoss }, target);
 }
 
 function solveWide(target: Color, rng: Rng): SpsaResult {
@@ -173,6 +190,11 @@ function loss(target: Color, filters: readonly number[], scratch: Color): number
   );
 }
 
+/** Loss for a standalone set of parameters, outside the SPSA hot loop. */
+function lossOf(target: Color, filters: readonly number[]): number {
+  return loss(target, filters, new Color(0, 0, 0));
+}
+
 /**
  * Applies the solved chain in the same order the browser will. Exported so
  * tests can verify the emitted CSS actually produces the requested colour.
@@ -206,13 +228,22 @@ export function resultColor(solution: FilterSolution): Color {
   return color;
 }
 
-function describe(result: SpsaResult): FilterSolution {
+function describe(result: SpsaResult, target: Color): FilterSolution {
   const raw = formatChain(result.values);
+
+  const actual = new Color(0, 0, 0);
+  applyFilters(actual, effectiveValues(result.values));
+  const maxChannelDelta = Math.max(
+    Math.abs(actual.r - target.r),
+    Math.abs(actual.g - target.g),
+    Math.abs(actual.b - target.b),
+  );
 
   return {
     values: result.values,
     loss: result.loss,
-    quality: qualityOf(result.loss),
+    maxChannelDelta,
+    quality: qualityOf(maxChannelDelta),
     raw,
     css: `filter: ${raw};`,
     customProperty: `--icon-filter: ${raw};`,
@@ -238,16 +269,17 @@ function formatChain(values: readonly number[]): string {
   );
 }
 
-function qualityOf(loss: number): SolutionQuality {
-  if (loss < 1) return 'perfect';
-  if (loss < 5) return 'close';
-  if (loss < 15) return 'off';
+/** Thresholds are in 0-255 channel units, so they map to what you can see. */
+function qualityOf(maxChannelDelta: number): SolutionQuality {
+  if (maxChannelDelta < 0.5) return 'perfect';
+  if (maxChannelDelta < 2) return 'close';
+  if (maxChannelDelta < 8) return 'off';
   return 'bad';
 }
 
 export const QUALITY_LABELS: Record<SolutionQuality, string> = {
-  perfect: 'Perfect match',
-  close: 'Close enough',
+  perfect: 'Exact match',
+  close: 'Visually identical',
   off: 'Slightly off — try solving again',
   bad: 'Well off — solve again',
 };

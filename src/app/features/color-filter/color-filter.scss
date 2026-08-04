@@ -123,6 +123,21 @@
   @include layout.hint;
 }
 
+.waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 52px 16px;
+  color: var(--mat-sys-on-surface-variant);
+
+  p {
+    margin: 0;
+    font-size: 13px;
+  }
+}
+
 .outputs {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));

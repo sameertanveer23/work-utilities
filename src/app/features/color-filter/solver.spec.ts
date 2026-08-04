@@ -16,16 +16,28 @@ describe('solve', () => {
       const solution = solve(target);
       const actual = resultColor(solution);
 
-      expect(actual.r).toBeCloseTo(target.r, -1);
-      expect(actual.g).toBeCloseTo(target.g, -1);
-      expect(actual.b).toBeCloseTo(target.b, -1);
-      expect(solution.loss).toBeLessThan(5);
+      // Tolerance is in 0-255 channel units. Measured worst case across 360
+      // runs is under 2, so 4 leaves headroom without hiding a regression.
+      // Asserting on `loss` here would be wrong: it carries HSL terms that read
+      // high for near-greys even when the rendered colour is exact.
+      expect(Math.abs(actual.r - target.r)).toBeLessThan(4);
+      expect(Math.abs(actual.g - target.g)).toBeLessThan(4);
+      expect(Math.abs(actual.b - target.b)).toBeLessThan(4);
+      expect(solution.maxChannelDelta).toBeLessThan(4);
     });
   }
 
   it('lands on a good result without the caller retrying', () => {
     // The whole point of best-of-N: a single call should be usable.
     const solution = solve(parseColor('#00a3e0')!);
+    expect(['perfect', 'close']).toContain(solution.quality);
+  });
+
+  it('rates quality by rendered colour error, not by the optimiser score', () => {
+    // Near-greys carry a high HSL loss while still rendering exactly; the
+    // rating must not punish them for that.
+    const solution = solve(parseColor('#333333')!);
+    expect(solution.maxChannelDelta).toBeLessThan(4);
     expect(['perfect', 'close']).toContain(solution.quality);
   });
 

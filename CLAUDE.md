@@ -57,7 +57,15 @@ Reactive form → `toSignal(form.valueChanges)` → `computed()` outputs. Output
 
 Pure logic goes in a sibling file (`in-query.ts`, `branch-name.ts`, `codecs.ts`, `timestamp.ts`, `json-format.ts`, `color.ts`/`solver.ts`) with a `.spec.ts` next to it. That is where the tests live — there are no component DOM tests, deliberately.
 
-`color-filter` is the one deliberate exception to "compute live on every keystroke": solving costs a few milliseconds, so it runs off a `debounceTime(250)` stream feeding a `solution` signal, re-triggered by a `nonce` signal behind the "Solve again" button. Don't convert it to a plain `computed`.
+`color-filter` and `base64-file` are the deliberate exceptions to "compute live on every keystroke", because their work is expensive enough to stall the page. Both debounce the input and expose a `*Pending` signal that drives a spinner. Don't convert either to a plain `computed`.
+
+### base64-file
+
+Format is identified from **magic bytes** ([file-signatures.ts](src/app/features/base64-file/file-signatures.ts)), never from a declared MIME type — the tool warns when a `data:` URI's claim disagrees with the actual bytes.
+
+Browsers can't render TIFF, so [tiff-preview.ts](src/app/features/base64-file/tiff-preview.ts) decodes it to a canvas via `utif2`, **dynamically imported** so its ~34kB only loads when someone pastes a TIFF. Pages are rendered one at a time rather than all at once, so a large multi-page fax doesn't exhaust memory. `utif2` and `pako` are CommonJS and listed in `allowedCommonJsDependencies` in [angular.json](angular.json).
+
+Two things to preserve: base64 conversion is **chunked** (`String.fromCharCode` over a whole multi-MB buffer overflows the argument limit), and the encoded output is **truncated for display** while copy and download use the full string — a 10MB file is ~13MB of base64 and will hang the tab if rendered whole. Object URLs are created and revoked in an `effect` with `onCleanup`.
 
 `slugifyBranchTitle` in [branch-name.ts](src/app/features/branch-name-generator/branch-name.ts) is a verbatim port of the original tool's slug logic and its output is pinned by tests. Don't "improve" it casually — branch names already in use depend on it.
 

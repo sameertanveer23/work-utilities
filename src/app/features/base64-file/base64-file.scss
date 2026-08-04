@@ -1,0 +1,228 @@
+@use '../../shared/utility-layout' as layout;
+
+.mode {
+  margin-bottom: 16px;
+}
+
+.grid {
+  @include layout.two-panel(380px);
+}
+
+.hint {
+  @include layout.hint;
+}
+
+// Shared loading state for decode, encode and TIFF rendering.
+.waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 44px 16px;
+  color: var(--mat-sys-on-surface-variant);
+
+  p {
+    margin: 0;
+    font-size: 13px;
+  }
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--mat-sys-primary) 20%, transparent);
+  color: var(--mat-sys-primary);
+}
+
+.chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.warn-chip {
+  border-color: var(--wu-warn);
+  color: var(--wu-warn);
+}
+
+.warn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--wu-warn);
+
+  app-icon {
+    font-size: 17px;
+  }
+
+  code {
+    font-family: var(--wu-mono);
+  }
+}
+
+.preview {
+  border-radius: var(--wu-radius-sm);
+  border: 1px solid var(--mat-sys-outline-variant);
+  overflow: hidden;
+  // Checkerboard so transparent PNGs are readable in either theme.
+  background:
+    repeating-conic-gradient(var(--mat-sys-surface-container-highest) 0% 25%, transparent 0% 50%)
+    50% / 16px 16px;
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: 440px;
+    border: 0;
+    background: #fff;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: 440px;
+    margin: 0 auto;
+    object-fit: contain;
+  }
+
+  pre {
+    margin: 0;
+    padding: 12px 14px;
+    max-height: 440px;
+    overflow: auto;
+    background: var(--wu-code-bg);
+    color: var(--wu-code-fg);
+    font-family: var(--wu-mono);
+    font-size: 12.5px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+
+.no-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 52px 16px;
+  color: var(--mat-sys-on-surface-variant);
+
+  app-icon {
+    font-size: 38px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+  }
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 12.5px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--wu-radius-sm);
+  border: 1px solid var(--mat-sys-error);
+  background: color-mix(in srgb, var(--mat-sys-error) 12%, transparent);
+
+  app-icon {
+    font-size: 22px;
+    color: var(--mat-sys-error);
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+  }
+}
+
+.filename {
+  max-width: 200px;
+  margin-bottom: -1.25em; // absorb the reserved subscript row
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 46px 20px;
+  border-radius: var(--wu-radius);
+  border: 2px dashed var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover,
+  &.dragging {
+    border-color: var(--mat-sys-primary);
+    background: color-mix(in srgb, var(--mat-sys-primary) 8%, transparent);
+  }
+
+  app-icon {
+    font-size: 40px;
+    color: var(--mat-sys-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 13.5px;
+  }
+
+  span {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.output {
+  width: 100%;
+  resize: vertical;
+  padding: 12px 14px;
+  border-radius: var(--wu-radius-sm);
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--wu-code-bg);
+  color: var(--wu-code-fg);
+  font-family: var(--wu-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-all;
+
+  &:focus {
+    outline: none;
+    border-color: var(--mat-sys-primary);
+  }
+}

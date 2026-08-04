@@ -1,0 +1,242 @@
+<app-utility-page utilityId="base64-file">
+  <mat-button-toggle-group
+    class="mode"
+    aria-label="Direction"
+    [value]="mode()"
+    (change)="mode.set($event.value)"
+  >
+    <mat-button-toggle value="decode">Base64 → File</mat-button-toggle>
+    <mat-button-toggle value="encode">File → Base64</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  @if (mode() === 'decode') {
+    <div class="grid" [formGroup]="form">
+      <app-panel heading="Base64" icon="data_object" [hasFooter]="true">
+        <mat-form-field appearance="outline">
+          <mat-label>Paste base64 or a data URI</mat-label>
+          <textarea
+            matInput
+            formControlName="input"
+            rows="16"
+            spellcheck="false"
+            placeholder="JVBERi0xLjQK… or data:application/pdf;base64,…"
+          ></textarea>
+          @if (decodeError()) {
+            <mat-error>{{ decodeError() }}</mat-error>
+          } @else {
+            <mat-hint>Newlines, URL-safe characters and missing padding are all fine.</mat-hint>
+          }
+        </mat-form-field>
+
+        <div panel-footer>
+          <button matButton type="button" (click)="clearDecode()">
+            <app-icon matButtonIcon name="delete_sweep" />
+            Clear
+          </button>
+        </div>
+      </app-panel>
+
+      <app-panel heading="File" icon="draft" [hasFooter]="true">
+        @if (decodePending()) {
+          <div class="waiting">
+            <mat-spinner diameter="28" />
+            <p>Decoding…</p>
+          </div>
+        } @else if (decodeError()) {
+          <div class="error">
+            <app-icon name="error" />
+            <p>{{ decodeError() }}</p>
+          </div>
+        } @else if (bytesReady()) {
+          <div class="meta">
+            <span class="badge">{{ kind().label }}</span>
+            <span class="chip">{{ sizeLabel() }}</span>
+            @if (dimensions(); as size) {
+              <span class="chip">{{ size }}</span>
+            }
+            @if (tiffPageCount() > 1) {
+              <span class="chip">{{ tiffPageCount() }} pages</span>
+            }
+          </div>
+
+          @if (mimeMismatch(); as declared) {
+            <p class="warn">
+              <app-icon name="warning" />
+              The data URI claims <code>{{ declared }}</code
+              >, but the bytes are {{ kind().label }}.
+            </p>
+          }
+
+          <div class="preview">
+            @switch (kind().preview) {
+              @case ('pdf') {
+                <iframe [src]="safeUrl()" title="PDF preview"></iframe>
+              }
+              @case ('image') {
+                <img [src]="imageUrl()" alt="Decoded image preview" />
+              }
+              @case ('tiff') {
+                @if (tiffLoading()) {
+                  <div class="waiting">
+                    <mat-spinner diameter="28" />
+                    <p>Rendering TIFF…</p>
+                  </div>
+                } @else if (tiffError()) {
+                  <div class="error">
+                    <app-icon name="error" />
+                    <p>{{ tiffError() }}</p>
+                  </div>
+                } @else if (tiffImage(); as image) {
+                  <img [src]="image" alt="Decoded TIFF preview" />
+                }
+              }
+              @case ('text') {
+                <pre>{{ textPreview() }}</pre>
+              }
+              @default {
+                <div class="no-preview">
+                  <app-icon name="draft" />
+                  <p>No preview for {{ kind().label }} — download it instead.</p>
+                </div>
+              }
+            }
+          </div>
+
+          @if (tiffPageCount() > 1) {
+            <div class="pager">
+              <button
+                matIconButton
+                type="button"
+                aria-label="Previous page"
+                [disabled]="tiffPage() === 0 || tiffLoading()"
+                (click)="goToPage(tiffPage() - 1)"
+              >
+                <app-icon name="chevron_left" />
+              </button>
+              <span>Page {{ tiffPage() + 1 }} of {{ tiffPageCount() }}</span>
+              <button
+                matIconButton
+                type="button"
+                aria-label="Next page"
+                [disabled]="tiffPage() + 1 >= tiffPageCount() || tiffLoading()"
+                (click)="goToPage(tiffPage() + 1)"
+              >
+                <app-icon name="chevron_right" />
+              </button>
+            </div>
+          }
+        } @else {
+          <p class="hint">Paste base64 to identify and preview the file.</p>
+        }
+
+        <div panel-footer>
+          <mat-form-field appearance="outline" class="filename">
+            <mat-label>File name</mat-label>
+            <input
+              matInput
+              [value]="filename()"
+              [disabled]="!bytesReady()"
+              spellcheck="false"
+              (input)="onFilenameInput($event)"
+            />
+          </mat-form-field>
+          <button
+            matButton="filled"
+            type="button"
+            [disabled]="!bytesReady()"
+            (click)="download()"
+          >
+            <app-icon matButtonIcon name="download" />
+            Download {{ fullFilename() }}
+          </button>
+        </div>
+      </app-panel>
+    </div>
+  } @else {
+    <div class="grid">
+      <app-panel heading="File" icon="upload_file" [hasFooter]="true">
+        <label
+          class="dropzone"
+          [class.dragging]="dragging()"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)"
+        >
+          <input type="file" hidden (change)="onFileSelected($event)" />
+          @if (encoding()) {
+            <mat-spinner diameter="32" />
+            <p>Reading file…</p>
+          } @else {
+            <app-icon name="cloud_upload" />
+            <p><strong>Drop a file</strong> or click to browse</p>
+            <span>PDF, TIFF, PNG or anything else. It never leaves your browser.</span>
+          }
+        </label>
+
+        @if (encodeError()) {
+          <div class="error">
+            <app-icon name="error" />
+            <p>{{ encodeError() }}</p>
+          </div>
+        }
+
+        @if (encoded(); as file) {
+          <div class="meta">
+            <span class="badge">{{ file.kind.label }}</span>
+            <span class="chip">{{ formatBytes(file.bytes.length) }}</span>
+            <span class="chip">{{ file.name }}</span>
+          </div>
+        }
+
+        <div panel-footer>
+          <button matButton type="button" [disabled]="!encoded()" (click)="clearEncode()">
+            <app-icon matButtonIcon name="delete_sweep" />
+            Clear
+          </button>
+        </div>
+      </app-panel>
+
+      <app-panel heading="Base64" icon="data_object" [hasFooter]="true">
+        @if (encoding()) {
+          <div class="waiting">
+            <mat-spinner diameter="28" />
+            <p>Encoding…</p>
+          </div>
+        } @else if (encoded()) {
+          <div class="options">
+            <mat-slide-toggle [checked]="asDataUri()" (change)="asDataUri.set($event.checked)">
+              data: URI prefix
+            </mat-slide-toggle>
+            <mat-slide-toggle [checked]="wrapLines()" (change)="wrapLines.set($event.checked)">
+              Wrap at 76 chars
+            </mat-slide-toggle>
+          </div>
+
+          <textarea class="output" readonly rows="14" spellcheck="false">{{ displayOutput() }}</textarea>
+
+          <div class="meta">
+            <span class="chip">{{ encodedLength() }} characters</span>
+            @if (truncated()) {
+              <span class="chip warn-chip">Preview truncated — copy and download use the full string</span>
+            }
+          </div>
+        } @else {
+          <p class="hint">Pick a file to encode it as base64.</p>
+        }
+
+        <div panel-footer>
+          <app-copy-button [text]="encodedOutput()" key="b64-out" label="Copy base64" />
+          <button
+            matButton="outlined"
+            type="button"
+            [disabled]="!encoded()"
+            (click)="downloadBase64()"
+          >
+            <app-icon matButtonIcon name="download" />
+            Download .txt
+          </button>
+        </div>
+      </app-panel>
+    </div>
+  }
+</app-utility-page>

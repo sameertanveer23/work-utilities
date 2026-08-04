@@ -5,6 +5,7 @@ import { debounceTime, distinctUntilChanged, filter, map, startWith } from 'rxjs
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CodeView } from '../../shared/code-view/code-view';
 import { CopyButton } from '../../shared/copy-button/copy-button';
 import { Icon } from '../../shared/icon/icon';
@@ -31,6 +32,7 @@ interface OutputRow {
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    MatProgressSpinnerModule,
     CodeView,
     CopyButton,
     Icon,
@@ -74,6 +76,12 @@ export class ColorFilter {
     { initialValue: parseColor(DEFAULT_COLOR)! },
   );
 
+  /** True while the debounce is still catching up with what you've typed. */
+  readonly solvePending = computed(() => {
+    const target = this.target();
+    return target !== null && target.toHex() !== this.settledColor().toHex();
+  });
+
   readonly qualityLabel = computed(() => {
     const solution = this.solution();
     return solution ? QUALITY_LABELS[solution.quality] : '';
@@ -81,7 +89,13 @@ export class ColorFilter {
 
   readonly stats = computed<Stat[]>(() => {
     const solution = this.solution();
-    return solution ? [{ label: 'loss', value: solution.loss.toFixed(2) }] : [];
+    if (!solution) return [];
+    return [
+      // Channel error is what you can actually see; loss is the optimiser's
+      // own score and reads high for near-greys even when the match is exact.
+      { label: '/255 colour error', value: solution.maxChannelDelta.toFixed(1) },
+      { label: 'loss', value: solution.loss.toFixed(2) },
+    ];
   });
 
   /** Hex for the native colour swatch, which only accepts `#rrggbb`. */

@@ -34,7 +34,12 @@
     </app-panel>
 
     <app-panel heading="Preview" icon="visibility">
-      @if (solution(); as result) {
+      @if (solvePending()) {
+        <div class="waiting">
+          <mat-spinner diameter="28" />
+          <p>Searching for a filter…</p>
+        </div>
+      } @else if (solution(); as result) {
         <div class="swatches">
           <div class="swatch">
             <span class="chip" [style.background]="target()?.toRgbString()"></span>
