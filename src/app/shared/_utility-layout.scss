@@ -1,0 +1,23 @@
+// Layout bits shared by the two-panel utilities. Use with
+// `@use '../../shared/utility-layout' as layout;` then `@include layout.two-panel;`
+
+@mixin two-panel($min: 380px) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min, 1fr));
+  gap: var(--wu-gap);
+  align-items: start;
+}
+
+@mixin hint {
+  margin: 0;
+  padding: 28px 8px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 13px;
+}
+
+@mixin shortcut {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--mat-sys-on-surface-variant);
+}

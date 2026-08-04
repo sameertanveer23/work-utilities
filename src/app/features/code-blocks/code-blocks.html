@@ -1,0 +1,56 @@
+<app-utility-page utilityId="code-blocks">
+  <div class="toolbar">
+    <div class="search">
+      <app-icon name="search" />
+      <input
+        type="search"
+        placeholder="Search titles, code and tags"
+        aria-label="Search snippets"
+        [value]="search()"
+        (input)="onSearchInput($event)"
+      />
+    </div>
+
+    <div class="chips">
+      @for (lang of languages(); track lang) {
+        <button
+          type="button"
+          class="chip"
+          [class.selected]="language() === lang"
+          (click)="toggleLanguage(lang)"
+        >
+          {{ lang }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="cards">
+    @for (snippet of snippets(); track snippet.id) {
+      <article class="card">
+        <header>
+          <div class="meta">
+            <h3>{{ snippet.title }}</h3>
+            <span class="badge">{{ snippet.language }}</span>
+            @for (tag of snippet.tags ?? []; track tag) {
+              <span class="tag">{{ tag }}</span>
+            }
+          </div>
+          <app-copy-button
+            variant="icon"
+            [text]="snippet.code"
+            [key]="'snippet-' + snippet.id"
+            [tooltip]="'Copy ' + snippet.title"
+          />
+        </header>
+        <app-code-view [code]="snippet.code" />
+      </article>
+    } @empty {
+      <div class="empty">
+        <app-icon name="search_off" />
+        <p>No snippets match your filters.</p>
+        <button matButton type="button" (click)="reset()">Clear filters</button>
+      </div>
+    }
+  </div>
+</app-utility-page>

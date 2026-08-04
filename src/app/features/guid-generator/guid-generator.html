@@ -1,0 +1,37 @@
+<app-utility-page utilityId="guid-generator">
+  <form class="grid" [formGroup]="form">
+    <app-panel heading="Options" icon="tune" [hasFooter]="true">
+      <mat-form-field appearance="outline">
+        <mat-label>How many</mat-label>
+        <input matInput type="number" formControlName="count" min="1" max="500" />
+        <mat-hint>1 to 500</mat-hint>
+      </mat-form-field>
+
+      <mat-slide-toggle formControlName="uppercase">Uppercase</mat-slide-toggle>
+      <mat-slide-toggle formControlName="braces">Wrap in braces</mat-slide-toggle>
+      <mat-slide-toggle formControlName="hyphens">Keep hyphens</mat-slide-toggle>
+
+      <div panel-footer>
+        <button matFlatButton type="button" (click)="generate()">
+          <app-icon name="refresh" />
+          Generate
+        </button>
+      </div>
+    </app-panel>
+
+    <app-panel heading="GUIDs" icon="fingerprint" [hasFooter]="true">
+      <ul class="list">
+        @for (guid of guids(); track $index) {
+          <li>
+            <code>{{ guid }}</code>
+            <app-copy-button variant="icon" [text]="guid" [key]="'guid-' + $index" />
+          </li>
+        }
+      </ul>
+
+      <div panel-footer>
+        <app-copy-button [text]="allText()" key="guid-all" label="Copy all" />
+      </div>
+    </app-panel>
+  </form>
+</app-utility-page>

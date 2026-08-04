@@ -1,0 +1,68 @@
+<app-utility-page utilityId="json-formatter">
+  <form class="grid" [formGroup]="form">
+    <app-panel heading="Input" icon="edit_note" [hasFooter]="true">
+      <mat-form-field appearance="outline">
+        <mat-label>JSON</mat-label>
+        <textarea
+          matInput
+          formControlName="raw"
+          rows="16"
+          spellcheck="false"
+          placeholder='{ "hello": "world" }'
+        ></textarea>
+      </mat-form-field>
+
+      <div class="options">
+        <mat-form-field appearance="outline">
+          <mat-label>Indent</mat-label>
+          <mat-select formControlName="indent">
+            <mat-option [value]="2">2 spaces</mat-option>
+            <mat-option [value]="4">4 spaces</mat-option>
+            <mat-option [value]="8">8 spaces</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-slide-toggle formControlName="minify">Minify</mat-slide-toggle>
+      </div>
+
+      <div panel-footer>
+        <button matButton type="button" (click)="clear()">
+          <app-icon name="delete_sweep" />
+          Clear
+        </button>
+      </div>
+    </app-panel>
+
+    <app-panel heading="Output" icon="data_object" [hasFooter]="true">
+      @if (result().error) {
+        <div class="error">
+          <app-icon name="error" />
+          <div>
+            <strong>Invalid JSON</strong>
+            <p>{{ result().error }}</p>
+            @if (result().line !== null) {
+              <p class="position">Line {{ result().line }}, column {{ result().column }}</p>
+            }
+          </div>
+        </div>
+      } @else if (result().output) {
+        <app-code-view [code]="result().output" [maxHeight]="480" />
+        <app-stat-chips [stats]="stats()" />
+      } @else {
+        <p class="hint">Paste some JSON to format or validate it.</p>
+      }
+
+      <div panel-footer>
+        <app-copy-button [text]="result().output" label="Copy JSON" />
+        <button
+          matStrokedButton
+          type="button"
+          [disabled]="!result().output"
+          (click)="downloadJson()"
+        >
+          <app-icon name="download" />
+          Download
+        </button>
+      </div>
+    </app-panel>
+  </form>
+</app-utility-page>

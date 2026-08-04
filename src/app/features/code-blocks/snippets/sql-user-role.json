@@ -1,0 +1,5 @@
+{
+  "title": "User Role",
+  "language": "SQL",
+  "code": "Select u.Id, u.FirstName, u.LastName, r.Name, u.IsEnabled\nfrom [user].AspNetUsers u\nJoin [user].AspNetUserRoles ur on ur.UserId = u.Id\nJoin [user].AspNetRoles r on r.Id = ur.RoleId"
+}

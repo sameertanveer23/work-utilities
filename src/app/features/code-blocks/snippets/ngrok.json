@@ -1,0 +1,5 @@
+{
+  "title": "Ngrok command",
+  "language": "ngrok",
+  "code": "ngrok http http://localhost:7080 "
+}

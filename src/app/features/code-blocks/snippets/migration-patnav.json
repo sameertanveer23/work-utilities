@@ -1,0 +1,5 @@
+{
+  "title": "Migration Patnav",
+  "language": "C#",
+  "code": "$env:PatNavSchemaName= \"patnav\"\nAdd-Migration MIRATIONNAME -Context PatNavDataContext -OutputDir PatNav\\Data\\Migrations"
+}

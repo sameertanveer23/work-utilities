@@ -1,0 +1,58 @@
+<app-utility-page utilityId="branch-name-generator">
+  <form class="grid" [formGroup]="form">
+    <app-panel heading="Input" icon="edit_note" [hasFooter]="true">
+      <mat-form-field appearance="outline">
+        <mat-label>Prefix</mat-label>
+        <mat-select formControlName="prefix">
+          <mat-option value="">None</mat-option>
+          <mat-option value="feature/">feature/</mat-option>
+          <mat-option value="bugfix/">bugfix/</mat-option>
+          <mat-option value="hotfix/">hotfix/</mat-option>
+          <mat-option value="release/">release/</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Card number</mat-label>
+        <input matInput formControlName="cardNumber" placeholder="AP-3961" spellcheck="false" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Card title</mat-label>
+        <textarea
+          matInput
+          formControlName="cardTitle"
+          rows="4"
+          placeholder="Fix the patient navigator's study filter"
+        ></textarea>
+      </mat-form-field>
+
+      <div panel-footer>
+        <button matButton type="button" (click)="clear()">
+          <app-icon name="delete_sweep" />
+          Clear
+        </button>
+      </div>
+    </app-panel>
+
+    <app-panel heading="Branch name" icon="account_tree" [hasFooter]="true">
+      @if (branchName()) {
+        <output class="branch">{{ branchName() }}</output>
+        <code class="checkout">{{ checkoutCommand() }}</code>
+        <app-stat-chips [stats]="stats()" />
+      } @else {
+        <p class="hint">Enter a card number or title to build a branch name.</p>
+      }
+
+      <div panel-footer>
+        <app-copy-button [text]="branchName()" [key]="branchKey" label="Copy name" />
+        <app-copy-button
+          [text]="checkoutCommand()"
+          [key]="checkoutKey"
+          label="Copy git checkout"
+        />
+        <span class="shortcut">Ctrl + Enter to copy</span>
+      </div>
+    </app-panel>
+  </form>
+</app-utility-page>

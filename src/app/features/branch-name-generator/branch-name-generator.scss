@@ -1,0 +1,32 @@
+@use '../../shared/utility-layout' as layout;
+
+.grid {
+  @include layout.two-panel;
+}
+
+.branch {
+  display: block;
+  padding: 14px 16px;
+  border-radius: var(--wu-radius-sm);
+  background: var(--wu-code-bg);
+  color: var(--wu-code-fg);
+  border: 1px solid var(--mat-sys-outline-variant);
+  font-family: var(--wu-mono);
+  font-size: 15px;
+  word-break: break-all;
+}
+
+.checkout {
+  font-family: var(--wu-mono);
+  font-size: 12.5px;
+  color: var(--mat-sys-on-surface-variant);
+  word-break: break-all;
+}
+
+.hint {
+  @include layout.hint;
+}
+
+.shortcut {
+  @include layout.shortcut;
+}

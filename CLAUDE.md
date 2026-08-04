@@ -4,30 +4,71 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A static, dependency-free collection of web-based developer utilities ("designed to get the job done with minimal clicks"). There is no build step, no package manager, and no test suite — everything is plain HTML/CSS/vanilla JS with Bootstrap 5, Font Awesome, and DevIcons loaded from CDNs.
+A personal collection of web-based developer utilities — "designed to get the job done with minimal clicks". Angular 21 SPA, dark-first, Angular Material (M3), no backend. Everything runs client-side.
 
-## Running
+Before August 2026 this was a vanilla HTML/JS single page; that version is in git history and none of it survives in the working tree.
 
-Open [index.html](index.html) in a browser. One caveat: the Code Blocks utility `fetch`es JSON files from disk, which browsers block under `file://`. To exercise that feature, serve the directory over HTTP:
+## Commands
 
 ```powershell
-python -m http.server 8000     # then browse to http://localhost:8000
+npm start        # ng serve on :4200 (runs the snippet codegen first)
+npm run build    # production build to dist/ (runs the snippet codegen first)
+npm test         # vitest, single run via ng test
+npm run snippets # regenerate the snippet index by hand
 ```
 
 ## Architecture
 
-Single-page app in [index.html](index.html) + [script.js](script.js), no framework and no router:
+### The utility registry is the single source of truth
 
-- The sidebar lists **categories** (SQL, .NET, Angular, General, Code Blocks); `toggleCategory()` is an accordion that closes all other categories.
-- Each utility is a `<div class="utility-view" id="...">` inside `.content-area`. `switchUtility(id, element)` swaps the `.active` class between views — that is the entire navigation mechanism.
-- `switchUtility` also updates the top-bar title from the hardcoded `utilityNames` map in [script.js:43](script.js#L43). **Adding a utility means touching three places**: a sidebar `.utility-item` with an `onclick="switchUtility('new-id', this)"`, a matching `.utility-view` div, and an entry in `utilityNames`.
-- All styling for the SPA lives in the `<style>` block of [index.html](index.html) — there is no separate CSS file.
-- Handlers are wired with inline `onclick` attributes, so utility functions must be top-level in [script.js](script.js) (global scope). Follow that pattern rather than introducing modules or listeners.
+[src/app/core/utility-registry.ts](src/app/core/utility-registry.ts) exports `UTILITIES: UtilityDef[]`. That one array drives:
 
-### Code Blocks utility
+- the routes ([src/app/app.routes.ts](src/app/app.routes.ts) maps over it — routes are never hand-written)
+- the sidebar groups ([src/app/layout/sidebar/](src/app/layout/sidebar/))
+- the Ctrl+K command palette ([src/app/layout/command-palette/](src/app/layout/command-palette/))
+- the welcome page card grid
+- the browser title and the page header
 
-Snippets are stored one-per-file as JSON in [utilities/code-blocks/](utilities/code-blocks/) and fetched lazily on first view. To add one, create the JSON file (`{ "title", "language", "code" }`, kebab-case filename, `\n` for newlines) **and** append the filename to the `codeBlockFiles` array at [script.js:57](script.js#L57) — files are not auto-discovered. See [utilities/code-blocks/README.md](utilities/code-blocks/README.md). Rendered code is HTML-escaped via `escapeHtml()`; note the surrounding card markup is built by string interpolation of `block.title`/`block.language`, which are not escaped.
+**To add a utility**: write a standalone component under `src/app/features/<name>/`, then append one entry to `UTILITIES`. That is the whole checklist. Categories live in [src/app/core/categories.ts](src/app/core/categories.ts); a category with no utilities is simply not rendered.
 
-### Legacy / orphaned files
+`scoreUtility()` in the registry does the ranking for both the sidebar filter and the palette — reuse it rather than writing another matcher.
 
-[sql_in_generator.html](sql_in_generator.html) is a standalone earlier version of the IN-generator, superseded by the `in-generator` view in the SPA. [utilities/angular/index.html](utilities/angular/index.html), [utilities/general/index.html](utilities/general/index.html), and [utilities/net/index.html](utilities/net/index.html) are "Coming Soon" placeholder pages with their own dark-theme styling; nothing in the SPA links to them (the sidebar shows inert "Coming Soon" items instead). Don't assume these are wired in — new work belongs in the SPA unless asked otherwise.
+### Shell
+
+[src/app/app.ts](src/app/app.ts) is the shell: sidebar + top bar + `<router-outlet>`. It owns the global Ctrl+K / ⌘K listener and the handset breakpoint (`max-width: 899px`) that turns the sidebar into an overlay drawer. Everything is standalone and `OnPush`, and the app is zoneless (Angular 21 default — no zone.js).
+
+### Shared building blocks
+
+Reuse these rather than rolling new ones:
+
+| Piece | Path | Notes |
+|---|---|---|
+| `UtilityPage` | [src/app/shared/utility-page/](src/app/shared/utility-page/) | Page header, favorite star, records "recently used". Every feature wraps its content in this and passes `utilityId`. |
+| `Panel` | [src/app/shared/panel/](src/app/shared/panel/) | The input/output card. Project actions with `panel-footer`. |
+| `CopyButton` | [src/app/shared/copy-button/](src/app/shared/copy-button/) | Icon or labelled variant. Pass a distinct `key` when several sit together. |
+| `CodeView`, `StatChips`, `Icon` | `src/app/shared/` | `Icon` wraps the self-hosted Material Symbols font. |
+| `_utility-layout.scss` | [src/app/shared/_utility-layout.scss](src/app/shared/_utility-layout.scss) | `two-panel`, `hint`, `shortcut` mixins used by most features. |
+
+`ClipboardService` ([src/app/core/services/clipboard.service.ts](src/app/core/services/clipboard.service.ts)) owns the single "Copied!" timer for the whole app via a `copiedKey` signal — components should not run their own `setTimeout`. `FileDownloadService`, `ThemeService` and `FavoritesService` sit alongside it.
+
+### Feature component conventions
+
+Reactive form → `toSignal(form.valueChanges)` → `computed()` outputs. Output is live; there is no "Generate" button. `Ctrl+Enter` copies the primary output (`@HostListener` on the feature component, sharing a copy key with the visible button so both light up). Validation surfaces as an inline hint or a `mat-error`, never `alert()`.
+
+Pure logic goes in a sibling file (`in-query.ts`, `branch-name.ts`, `codecs.ts`, `timestamp.ts`, `json-format.ts`) with a `.spec.ts` next to it. That is where the tests live — there are no component DOM tests, deliberately.
+
+`slugifyBranchTitle` in [branch-name.ts](src/app/features/branch-name-generator/branch-name.ts) is a verbatim port of the original tool's slug logic and its output is pinned by tests. Don't "improve" it casually — branch names already in use depend on it.
+
+### Code Blocks snippets
+
+Snippets are one JSON file each in [src/app/features/code-blocks/snippets/](src/app/features/code-blocks/snippets/), shaped `{ title, language, code, tags? }` with `\n` for newlines.
+
+**Adding one is just dropping a file in that folder.** [scripts/generate-snippet-index.mjs](scripts/generate-snippet-index.mjs) scans the folder, validates the required fields, and writes `snippets.index.ts` with static imports (the `id` comes from the filename). It runs on `prestart`/`prebuild`; the generated file is committed so a bare `ng build` works. Never edit `snippets.index.ts` by hand.
+
+### Theming
+
+Material 3 via `mat.theme()` in [src/styles.scss](src/styles.scss), which emits tokens that follow `color-scheme`. `ThemeService` toggles `.theme-dark` / `.theme-light` on `<html>` and persists to localStorage; an inline script in [src/index.html](src/index.html) applies it before first paint to avoid a flash.
+
+Use `var(--mat-sys-*)` system tokens for colors, plus the app-level `--wu-*` tokens (radius, gap, mono font, code colors) defined at the top of `styles.scss`. Don't hardcode hex values — the old stylesheet did, and removing that is exactly what this rewrite was for.
+
+Fonts (Roboto, Material Symbols) are self-hosted through the `styles` array in [angular.json](angular.json). There are no CDN dependencies; the app works offline.

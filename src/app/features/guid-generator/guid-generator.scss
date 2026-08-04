@@ -1,0 +1,33 @@
+@use '../../shared/utility-layout' as layout;
+
+.grid {
+  @include layout.two-panel(340px);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 520px;
+  overflow-y: auto;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0 2px 10px;
+    border-radius: var(--wu-radius-sm);
+
+    &:hover {
+      background: var(--mat-sys-surface-container-high);
+    }
+  }
+
+  code {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--wu-mono);
+    font-size: 13px;
+    word-break: break-all;
+  }
+}

@@ -1,0 +1,65 @@
+<app-utility-page utilityId="in-generator">
+  <form class="grid" [formGroup]="form">
+    <app-panel heading="Input" icon="edit_note" [hasFooter]="true">
+      <div class="two-up">
+        <mat-form-field appearance="outline">
+          <mat-label>Table name</mat-label>
+          <input matInput formControlName="tableName" placeholder="Users" spellcheck="false" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Column name</mat-label>
+          <input matInput formControlName="columnName" placeholder="UserId" spellcheck="false" />
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>ID format</mat-label>
+        <mat-select formControlName="format">
+          <mat-option value="single-quote">Single quotes — 'abc'</mat-option>
+          <mat-option value="double-quote">Double quotes — "abc"</mat-option>
+          <mat-option value="no-quote">No quotes — abc</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>IDs</mat-label>
+        <textarea
+          matInput
+          formControlName="rawIds"
+          rows="10"
+          spellcheck="false"
+          placeholder="One per line, or separated by commas"
+        ></textarea>
+        <mat-hint>Newlines, commas, semicolons and tabs all work as separators.</mat-hint>
+      </mat-form-field>
+
+      <mat-slide-toggle formControlName="dedupe">Remove duplicate IDs</mat-slide-toggle>
+
+      <div panel-footer>
+        <button matButton type="button" (click)="clear()">
+          <app-icon name="delete_sweep" />
+          Clear
+        </button>
+      </div>
+    </app-panel>
+
+    <app-panel heading="Query" icon="terminal" [hasFooter]="true">
+      @if (query()) {
+        <app-code-view [code]="query()" [maxHeight]="420" />
+        <app-stat-chips [stats]="stats()" />
+      } @else {
+        <p class="hint">{{ hint() }}</p>
+      }
+
+      <div panel-footer>
+        <app-copy-button [text]="query()" [key]="copyKey" label="Copy query" />
+        <button matStrokedButton type="button" [disabled]="!query()" (click)="downloadQuery()">
+          <app-icon name="download" />
+          Download .sql
+        </button>
+        <span class="shortcut">Ctrl + Enter to copy</span>
+      </div>
+    </app-panel>
+  </form>
+</app-utility-page>

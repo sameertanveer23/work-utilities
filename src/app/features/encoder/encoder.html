@@ -1,0 +1,60 @@
+<app-utility-page utilityId="encoder">
+  <form [formGroup]="form">
+    <div class="controls">
+      <mat-button-toggle-group formControlName="direction" aria-label="Direction">
+        <mat-button-toggle value="encode">Encode</mat-button-toggle>
+        <mat-button-toggle value="decode">Decode</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Format</mat-label>
+        <mat-select formControlName="codec">
+          <mat-option value="base64">Base64</mat-option>
+          <mat-option value="base64url">Base64 URL-safe</mat-option>
+          <mat-option value="url">URL (full)</mat-option>
+          <mat-option value="url-component">URL component</mat-option>
+          <mat-option value="html">HTML entities</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button matStrokedButton type="button" [disabled]="!result().output" (click)="swap()">
+        <app-icon name="swap_vert" />
+        Use output as input
+      </button>
+    </div>
+
+    <div class="grid">
+      <app-panel heading="Input" icon="edit_note" [hasFooter]="true">
+        <mat-form-field appearance="outline">
+          <mat-label>Text</mat-label>
+          <textarea matInput formControlName="input" rows="14" spellcheck="false"></textarea>
+        </mat-form-field>
+
+        <div panel-footer>
+          <button matButton type="button" (click)="clear()">
+            <app-icon name="delete_sweep" />
+            Clear
+          </button>
+        </div>
+      </app-panel>
+
+      <app-panel heading="Output" icon="swap_horiz" [hasFooter]="true">
+        @if (result().error) {
+          <div class="error">
+            <app-icon name="error" />
+            <p>{{ result().error }}</p>
+          </div>
+        } @else if (result().output) {
+          <app-code-view [code]="result().output" [maxHeight]="420" />
+          <app-stat-chips [stats]="stats()" />
+        } @else {
+          <p class="hint">Type or paste something to convert it.</p>
+        }
+
+        <div panel-footer>
+          <app-copy-button [text]="result().output" label="Copy output" />
+        </div>
+      </app-panel>
+    </div>
+  </form>
+</app-utility-page>

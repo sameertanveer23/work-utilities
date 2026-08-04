@@ -1,0 +1,58 @@
+<app-utility-page utilityId="timestamp-converter">
+  <form class="grid" [formGroup]="form">
+    <app-panel heading="Input" icon="edit_note" [hasFooter]="true">
+      <mat-form-field appearance="outline">
+        <mat-label>Epoch or date</mat-label>
+        <input
+          matInput
+          formControlName="input"
+          spellcheck="false"
+          placeholder="1754308800 or 2026-08-04T12:00:00Z"
+        />
+        <mat-hint>Unix epoch, ISO 8601, or anything Date can parse.</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Treat plain numbers as</mat-label>
+        <mat-select formControlName="unit">
+          <mat-option value="auto">Auto-detect</mat-option>
+          <mat-option value="seconds">Seconds</mat-option>
+          <mat-option value="milliseconds">Milliseconds</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <p class="tz">Your timezone: <strong>{{ timezone }}</strong></p>
+
+      <div panel-footer>
+        <button matFlatButton type="button" (click)="useNow()">
+          <app-icon name="schedule" />
+          Now
+        </button>
+        <span class="live">{{ nowSeconds() }}</span>
+      </div>
+    </app-panel>
+
+    <app-panel heading="Converted" icon="event" >
+      @if (parsed().error) {
+        <div class="error">
+          <app-icon name="error" />
+          <p>{{ parsed().error }}</p>
+        </div>
+      } @else if (rows().length) {
+        <dl>
+          @for (row of rows(); track row.key) {
+            <div class="row">
+              <dt>{{ row.label }}</dt>
+              <dd>
+                <span>{{ row.value }}</span>
+                <app-copy-button variant="icon" [text]="row.value" [key]="'ts-' + row.key" />
+              </dd>
+            </div>
+          }
+        </dl>
+      } @else {
+        <p class="hint">Enter a timestamp or a date to convert it.</p>
+      }
+    </app-panel>
+  </form>
+</app-utility-page>

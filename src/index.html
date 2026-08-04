@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" class="theme-dark">
+<head>
+  <meta charset="utf-8">
+  <title>Dev Utilities</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script>
+    // Apply the persisted theme before first paint to avoid a flash of the wrong theme.
+    (function () {
+      try {
+        var t = localStorage.getItem('wu.theme') || 'dark';
+        var dark = t === 'dark' || (t === 'system' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('theme-dark', dark);
+        document.documentElement.classList.toggle('theme-light', !dark);
+      } catch (e) { /* localStorage unavailable - keep the dark default */ }
+    })();
+  </script>
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>

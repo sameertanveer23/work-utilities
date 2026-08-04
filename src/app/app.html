@@ -1,0 +1,16 @@
+@if (isHandset() && drawerOpen()) {
+  <div class="scrim" (click)="closeDrawer()"></div>
+}
+
+<app-sidebar
+  [class.drawer]="isHandset()"
+  [class.open]="drawerOpen()"
+  (navigated)="closeDrawer()"
+/>
+
+<div class="main">
+  <app-top-bar [showMenu]="isHandset()" (menuClick)="drawerOpen.set(true)" />
+  <main>
+    <router-outlet />
+  </main>
+</div>

@@ -1,0 +1,39 @@
+<div class="search">
+  <app-icon name="search" />
+  <input
+    #input
+    type="text"
+    autocomplete="off"
+    spellcheck="false"
+    placeholder="Jump to a utility…"
+    aria-label="Search utilities"
+    [value]="query()"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"
+  />
+  <kbd>Esc</kbd>
+</div>
+
+<ul role="listbox" aria-label="Utilities">
+  @for (utility of results(); track utility.id; let i = $index) {
+    <li
+      role="option"
+      [attr.aria-selected]="i === activeIndex()"
+      [class.active]="i === activeIndex()"
+      (mouseenter)="activeIndex.set(i)"
+      (click)="go(utility)"
+    >
+      <app-icon class="lead" [name]="utility.icon" />
+      <span class="text">
+        <span class="title">{{ utility.title }}</span>
+        <span class="desc">{{ utility.description }}</span>
+      </span>
+      @if (isFavorite(utility.id)) {
+        <app-icon class="star" name="star" />
+      }
+      <app-icon class="enter" name="keyboard_return" />
+    </li>
+  } @empty {
+    <li class="empty">No utilities match &ldquo;{{ query() }}&rdquo;.</li>
+  }
+</ul>

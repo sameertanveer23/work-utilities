@@ -1,0 +1,52 @@
+<section class="hero">
+  <h1>Dev Utilities</h1>
+  <p>Small tools, minimal clicks. Press <kbd>Ctrl</kbd> <kbd>K</kbd> to jump straight to one.</p>
+  <button matFlatButton type="button" (click)="palette.toggle()">
+    <app-icon name="search" />
+    Search utilities
+  </button>
+</section>
+
+@if (favorites().length > 0) {
+  <section>
+    <h2><app-icon name="star" /> Favorites</h2>
+    <div class="cards">
+      @for (utility of favorites(); track utility.id) {
+        <a class="card" [routerLink]="utility.path">
+          <app-icon class="lead" [name]="utility.icon" />
+          <span class="title">{{ utility.title }}</span>
+          <span class="desc">{{ utility.description }}</span>
+        </a>
+      }
+    </div>
+  </section>
+}
+
+@if (recents().length > 0) {
+  <section>
+    <h2><app-icon name="history" /> Recent</h2>
+    <div class="pills">
+      @for (utility of recents(); track utility.id) {
+        <a class="pill" [routerLink]="utility.path">
+          <app-icon [name]="utility.icon" />
+          {{ utility.shortTitle }}
+        </a>
+      }
+    </div>
+  </section>
+}
+
+@for (group of groups(); track group.category.id) {
+  <section>
+    <h2><app-icon [name]="group.category.icon" /> {{ group.category.label }}</h2>
+    <div class="cards">
+      @for (utility of group.utilities; track utility.id) {
+        <a class="card" [routerLink]="utility.path">
+          <app-icon class="lead" [name]="utility.icon" />
+          <span class="title">{{ utility.title }}</span>
+          <span class="desc">{{ utility.description }}</span>
+        </a>
+      }
+    </div>
+  </section>
+}

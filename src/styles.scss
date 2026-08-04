@@ -1,0 +1,94 @@
+// Fonts are self-hosted (see the `styles` array in angular.json) so the app
+// has no CDN dependencies and works offline.
+@use '@angular/material' as mat;
+
+// Material 3 theme. `mat.theme()` emits tokens that follow the `color-scheme`
+// of the element, so the light/dark switch below is all ThemeService has to do.
+html {
+  height: 100%;
+
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$cyan-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+
+  // App-level tokens. Everything the old inline stylesheet hardcoded
+  // (#0d6efd, #2c3e50, #27ae60, ...) now resolves through these.
+  --wu-sidebar-width: 264px;
+  --wu-sidebar-width-collapsed: 64px;
+  --wu-radius: 12px;
+  --wu-radius-sm: 8px;
+  --wu-gap: 16px;
+  --wu-page-max: 1400px;
+  --wu-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace;
+  --wu-success: #34d399;
+  --wu-warn: #fbbf24;
+}
+
+html.theme-dark {
+  color-scheme: dark;
+  --wu-code-bg: #14161a;
+  --wu-code-fg: #d7dce4;
+}
+
+html.theme-light {
+  color-scheme: light;
+  --wu-code-bg: #1e1e1e;
+  --wu-code-fg: #d4d4d4;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  overflow: hidden; // the shell owns scrolling
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
+}
+
+// Scrollbars that don't fight the dark theme.
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mat-sys-outline-variant) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+// Slightly tighter default for the many form fields across utilities.
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+// The command palette owns its own padding, so strip the dialog surface's.
+.wu-palette-panel .mat-mdc-dialog-surface {
+  padding: 0;
+  border-radius: var(--wu-radius);
+  overflow: hidden;
+}

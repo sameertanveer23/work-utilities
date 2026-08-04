@@ -1,0 +1,96 @@
+<div class="brand">
+  <a routerLink="/" class="logo" (click)="navigated.emit()">
+    <app-icon name="handyman" />
+    @if (!collapsed()) {
+      <span class="name">Dev Utilities</span>
+    }
+  </a>
+  <button
+    matIconButton
+    type="button"
+    class="collapse-toggle"
+    [matTooltip]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+    matTooltipPosition="right"
+    (click)="toggleCollapsed()"
+  >
+    <app-icon [name]="collapsed() ? 'chevron_right' : 'chevron_left'" />
+  </button>
+</div>
+
+@if (!collapsed()) {
+  <div class="filter">
+    <app-icon name="search" />
+    <input
+      type="search"
+      placeholder="Filter utilities"
+      aria-label="Filter utilities"
+      [value]="filter()"
+      (input)="onFilterInput($event)"
+    />
+    @if (filter()) {
+      <button type="button" class="clear" aria-label="Clear filter" (click)="clearFilter()">
+        <app-icon name="close" />
+      </button>
+    }
+  </div>
+}
+
+<nav>
+  @if (favorites().length > 0 && !filter()) {
+    <div class="group">
+      @if (!collapsed()) {
+        <div class="group-label">
+          <app-icon name="star" />
+          <span>Favorites</span>
+        </div>
+      }
+      @for (utility of favorites(); track utility.id) {
+        <a
+          class="item"
+          [routerLink]="utility.path"
+          routerLinkActive="active"
+          [matTooltip]="collapsed() ? utility.shortTitle : ''"
+          matTooltipPosition="right"
+          (click)="navigated.emit()"
+        >
+          <app-icon [name]="utility.icon" />
+          @if (!collapsed()) {
+            <span class="label">{{ utility.shortTitle }}</span>
+          }
+        </a>
+      }
+    </div>
+  }
+
+  @for (group of groups(); track group.category.id) {
+    <div class="group">
+      @if (!collapsed()) {
+        <div class="group-label">
+          <app-icon [name]="group.category.icon" />
+          <span>{{ group.category.label }}</span>
+        </div>
+      } @else {
+        <div class="group-divider"></div>
+      }
+      @for (utility of group.utilities; track utility.id) {
+        <a
+          class="item"
+          [routerLink]="utility.path"
+          routerLinkActive="active"
+          [matTooltip]="collapsed() ? utility.shortTitle : ''"
+          matTooltipPosition="right"
+          (click)="navigated.emit()"
+        >
+          <app-icon [name]="utility.icon" />
+          @if (!collapsed()) {
+            <span class="label">{{ utility.shortTitle }}</span>
+          }
+        </a>
+      }
+    </div>
+  }
+
+  @if (noMatches()) {
+    <p class="empty">No utilities match &ldquo;{{ filter() }}&rdquo;.</p>
+  }
+</nav>
