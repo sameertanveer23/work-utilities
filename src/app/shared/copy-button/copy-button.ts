@@ -28,13 +28,13 @@ let nextKey = 0;
       </button>
     } @else {
       <button
-        matStrokedButton
+        matButton="outlined"
         type="button"
         [disabled]="disabled()"
         [class.copied]="copied()"
         (click)="copy()"
       >
-        <app-icon [name]="copied() ? 'check' : 'content_copy'" />
+        <app-icon matButtonIcon [name]="copied() ? 'check' : 'content_copy'" />
         {{ copied() ? 'Copied!' : label() }}
       </button>
     }

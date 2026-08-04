@@ -24,8 +24,8 @@
       <p class="tz">Your timezone: <strong>{{ timezone }}</strong></p>
 
       <div panel-footer>
-        <button matFlatButton type="button" (click)="useNow()">
-          <app-icon name="schedule" />
+        <button matButton="filled" type="button" (click)="useNow()">
+          <app-icon matButtonIcon name="schedule" />
           Now
         </button>
         <span class="live">{{ nowSeconds() }}</span>

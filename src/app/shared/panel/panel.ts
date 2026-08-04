@@ -37,7 +37,7 @@ import { Icon } from '../icon/icon';
     header {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       padding: 12px 16px;
       border-bottom: 1px solid var(--mat-sys-outline-variant);
       background: var(--mat-sys-surface-container);
@@ -66,9 +66,9 @@ import { Icon } from '../icon/icon';
     footer {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 14px;
       flex-wrap: wrap;
-      padding: 12px 16px;
+      padding: 14px 16px;
       border-top: 1px solid var(--mat-sys-outline-variant);
       background: var(--mat-sys-surface-container);
     }

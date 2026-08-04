@@ -4,6 +4,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { CommandPaletteService } from './layout/command-palette/command-palette.service';
+import { Footer } from './layout/footer/footer';
 import { Sidebar } from './layout/sidebar/sidebar';
 import { TopBar } from './layout/top-bar/top-bar';
 
@@ -11,7 +12,7 @@ import { TopBar } from './layout/top-bar/top-bar';
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, Sidebar, TopBar],
+  imports: [RouterOutlet, Sidebar, TopBar, Footer],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

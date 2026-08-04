@@ -55,9 +55,17 @@ Reuse these rather than rolling new ones:
 
 Reactive form → `toSignal(form.valueChanges)` → `computed()` outputs. Output is live; there is no "Generate" button. `Ctrl+Enter` copies the primary output (`@HostListener` on the feature component, sharing a copy key with the visible button so both light up). Validation surfaces as an inline hint or a `mat-error`, never `alert()`.
 
-Pure logic goes in a sibling file (`in-query.ts`, `branch-name.ts`, `codecs.ts`, `timestamp.ts`, `json-format.ts`) with a `.spec.ts` next to it. That is where the tests live — there are no component DOM tests, deliberately.
+Pure logic goes in a sibling file (`in-query.ts`, `branch-name.ts`, `codecs.ts`, `timestamp.ts`, `json-format.ts`, `color.ts`/`solver.ts`) with a `.spec.ts` next to it. That is where the tests live — there are no component DOM tests, deliberately.
+
+`color-filter` is the one deliberate exception to "compute live on every keystroke": solving costs a few milliseconds, so it runs off a `debounceTime(250)` stream feeding a `solution` signal, re-triggered by a `nonce` signal behind the "Solve again" button. Don't convert it to a plain `computed`.
 
 `slugifyBranchTitle` in [branch-name.ts](src/app/features/branch-name-generator/branch-name.ts) is a verbatim port of the original tool's slug logic and its output is pinned by tests. Don't "improve" it casually — branch names already in use depend on it.
+
+### Ported third-party algorithm: the colour-filter solver
+
+[src/app/features/color-filter/](src/app/features/color-filter/) ports the SPSA solver from [angel-rs/css-color-filter-generator](https://github.com/angel-rs/css-color-filter-generator) (MIT), originally [this Stack Overflow answer](https://stackoverflow.com/a/43960991) (CC BY-SA). Attribution lives in the file headers; keep it there.
+
+Every constant in `solver.ts` is tuned, and `Color.hsl()` deliberately scales hue by `* 100` rather than `* 360` because that is how the loss function weights it. Changing any of these changes every result. Because the search is stochastic, the specs assert a **property** — replaying the emitted chain through the same filter maths must reproduce the target colour — rather than exact output values. Keep it that way; exact-value assertions here would be flaky.
 
 ### Code Blocks snippets
 

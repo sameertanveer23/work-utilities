@@ -1,0 +1,144 @@
+@use '../../shared/utility-layout' as layout;
+
+.grid {
+  @include layout.two-panel(340px);
+}
+
+.picker {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+// Strip the browser chrome off the native colour input so it reads as a swatch.
+.swatch-input {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--wu-radius-sm);
+  background: none;
+  cursor: pointer;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 3px;
+  }
+
+  &::-webkit-color-swatch,
+  &::-moz-color-swatch {
+    border: 0;
+    border-radius: 6px;
+  }
+}
+
+.explainer {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.swatches {
+  display: flex;
+  gap: 14px;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+// A checkerboard behind the swatches so pale results stay visible.
+.chip {
+  width: 100%;
+  height: 68px;
+  border-radius: var(--wu-radius-sm);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.chip.filtered {
+  background: #000;
+}
+
+.caption {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.sample {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  padding: 16px;
+  border-radius: var(--wu-radius-sm);
+  border: 1px solid var(--mat-sys-outline-variant);
+  background:
+    repeating-conic-gradient(var(--mat-sys-surface-container-highest) 0% 25%, transparent 0% 50%)
+    50% / 16px 16px;
+  color: #000;
+
+  app-icon {
+    font-size: 40px;
+  }
+}
+
+.sample-caption {
+  margin: 0;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.quality {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+
+  app-icon {
+    font-size: 18px;
+  }
+
+  &[data-quality='perfect'] {
+    color: var(--wu-success);
+  }
+  &[data-quality='close'] {
+    color: var(--mat-sys-on-surface);
+  }
+  &[data-quality='off'] {
+    color: var(--wu-warn);
+  }
+  &[data-quality='bad'] {
+    color: var(--mat-sys-error);
+  }
+}
+
+.hint {
+  @include layout.hint;
+}
+
+.outputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--wu-gap);
+  margin-top: var(--wu-gap);
+}
+
+.output-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.output-hint {
+  flex: 1;
+  font-size: 11.5px;
+  color: var(--mat-sys-on-surface-variant);
+}

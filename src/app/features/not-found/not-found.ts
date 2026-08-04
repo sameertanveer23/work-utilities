@@ -11,7 +11,7 @@ import { Icon } from '../../shared/icon/icon';
     <app-icon name="explore_off" />
     <h1>Nothing here</h1>
     <p>That URL doesn't match any utility.</p>
-    <a matFlatButton routerLink="/">Back to all utilities</a>
+    <a matButton="filled" routerLink="/">Back to all utilities</a>
   `,
   styles: `
     :host {

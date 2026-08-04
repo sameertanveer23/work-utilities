@@ -22,6 +22,7 @@ npm test         # unit tests
 |---|---|
 | **SQL IN Statement Generator** | Paste a list of IDs, get a `SELECT ... WHERE ... IN (...)` query. Quote style, dedupe, copy or download as `.sql`. |
 | **GUID Generator** | v4 GUIDs in bulk, with casing, brace and hyphen options. |
+| **CSS Color Filter Generator** | Find the `filter:` chain that recolors a black icon to any color. Live preview, four output formats. |
 | **Branch Name Generator** | Card number + title → a clean git branch name, plus the `git checkout -b` command. |
 | **JSON Formatter** | Pretty-print, minify and validate, with line/column error positions. |
 | **Encode / Decode** | Base64 (standard and URL-safe), URL, and HTML entities, both directions. |
@@ -49,3 +50,7 @@ Drop a JSON file into `src/app/features/code-blocks/snippets/`:
 ```
 
 The filename becomes the snippet id. There's no registry to update — the index is generated on `npm start` / `npm run build`.
+
+## Credits
+
+The colour-filter solver is ported from [angel-rs/css-color-filter-generator](https://github.com/angel-rs/css-color-filter-generator) (MIT), which implements Barrett Sonntag's / MultiplyByZer0's [Stack Overflow answer](https://stackoverflow.com/a/43960991) (CC BY-SA).

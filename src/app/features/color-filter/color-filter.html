@@ -1,0 +1,81 @@
+<app-utility-page utilityId="color-filter">
+  <form class="grid" [formGroup]="form">
+    <app-panel heading="Target colour" icon="palette" [hasFooter]="true">
+      <div class="picker">
+        <input
+          type="color"
+          class="swatch-input"
+          aria-label="Pick a colour"
+          [value]="swatch()"
+          (input)="onSwatchInput($event)"
+        />
+        <mat-form-field appearance="outline">
+          <mat-label>Hex or RGB</mat-label>
+          <input matInput formControlName="color" spellcheck="false" placeholder="#00a3e0" />
+          @if (invalid()) {
+            <mat-error>Try #00a3e0, #f80 or rgb(0, 163, 224).</mat-error>
+          } @else {
+            <mat-hint>Accepts #abc, #aabbcc or rgb(r, g, b).</mat-hint>
+          }
+        </mat-form-field>
+      </div>
+
+      <p class="explainer">
+        There's no algebraic inverse for a CSS filter chain, so this searches for one. The result is
+        stochastic — solve again if the loss looks high.
+      </p>
+
+      <div panel-footer>
+        <button matButton="outlined" type="button" (click)="solveAgain()">
+          <app-icon matButtonIcon name="casino" />
+          Solve again
+        </button>
+      </div>
+    </app-panel>
+
+    <app-panel heading="Preview" icon="visibility">
+      @if (solution(); as result) {
+        <div class="swatches">
+          <div class="swatch">
+            <span class="chip" [style.background]="target()?.toRgbString()"></span>
+            <span class="caption">Target</span>
+          </div>
+          <div class="swatch">
+            <span class="chip filtered" [style.filter]="result.raw"></span>
+            <span class="caption">Filtered</span>
+          </div>
+        </div>
+
+        <div class="sample" [style.filter]="result.raw">
+          <app-icon name="rocket_launch" />
+          <app-icon name="favorite" />
+          <app-icon name="shield" />
+          <app-icon name="bolt" />
+        </div>
+        <p class="sample-caption">Black icons with the filter applied.</p>
+
+        <div class="quality" [attr.data-quality]="result.quality">
+          <app-icon [name]="result.quality === 'perfect' ? 'check_circle' : 'info'" />
+          <span>{{ qualityLabel() }}</span>
+        </div>
+        <app-stat-chips [stats]="stats()" />
+      } @else {
+        <p class="hint">Pick a colour to generate a filter.</p>
+      }
+    </app-panel>
+  </form>
+
+  @if (solution()) {
+    <section class="outputs">
+      @for (output of outputs(); track output.key) {
+        <app-panel [heading]="output.label" icon="code">
+          <app-code-view [code]="output.value" [maxHeight]="120" />
+          <div class="output-footer">
+            <span class="output-hint">{{ output.hint }}</span>
+            <app-copy-button variant="icon" [text]="output.value" [key]="'cf-' + output.key" />
+          </div>
+        </app-panel>
+      }
+    </section>
+  }
+</app-utility-page>
