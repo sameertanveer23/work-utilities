@@ -1,17 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { readStored, writeStored } from '../../core/services/local-storage';
 import { CopyButton } from '../../shared/copy-button/copy-button';
 import { Icon } from '../../shared/icon/icon';
 import { Panel } from '../../shared/panel/panel';
-import { quoteFor } from './quotes';
+import { QUOTES, pickQuoteIndex } from './quotes';
+
+const LAST_QUOTE_KEY = 'wu.quote';
 
 @Component({
   selector: 'app-quote-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatButtonModule, MatTooltipModule, CopyButton, Icon, Panel],
   template: `
-    <app-panel heading="Quote of the day" icon="format_quote">
+    <app-panel heading="Quote" icon="format_quote">
       <div panel-actions class="actions">
         <app-copy-button variant="icon" key="quote" [text]="asText()" tooltip="Copy quote" />
         <button
@@ -63,14 +66,24 @@ import { quoteFor } from './quotes';
   `,
 })
 export class QuoteCard {
-  /** Chosen once per visit so the quote doesn't change under the reader. */
-  private readonly today = new Date();
-  private readonly offset = signal(0);
+  /**
+   * Picked at random on every load, and never the one shown last time, so a
+   * refresh always changes the quote. It then stays put while you read it; the
+   * shuffle button steps on from here.
+   */
+  private readonly index = signal(
+    pickQuoteIndex(QUOTES.length, readStored<number | null>(LAST_QUOTE_KEY, null)),
+  );
 
-  readonly quote = computed(() => quoteFor(this.today, this.offset()));
+  readonly quote = computed(() => QUOTES[this.index()]);
   readonly asText = computed(() => `“${this.quote().text}” — ${this.quote().author}`);
 
+  constructor() {
+    // Remember what is on screen, so the next load can avoid repeating it.
+    effect(() => writeStored(LAST_QUOTE_KEY, this.index()));
+  }
+
   next(): void {
-    this.offset.update((n) => n + 1);
+    this.index.update((i) => (i + 1) % QUOTES.length);
   }
 }

@@ -100,15 +100,13 @@ export const QUOTES: readonly Quote[] = [
 ];
 
 /**
- * Days since the epoch in the user's own calendar, so the quote rolls over at
- * local midnight rather than at UTC midnight.
+ * A random index that is never `previous`, so a refresh always shows a different
+ * quote. `random` is injectable (returns [0, 1)) to keep this testable.
  */
-export function localDayNumber(date: Date): number {
-  return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000);
-}
-
-/** The same quote all day; `offset` steps through the list for "another one". */
-export function quoteFor(date: Date, offset = 0): Quote {
-  const n = QUOTES.length;
-  return QUOTES[(((localDayNumber(date) + offset) % n) + n) % n];
+export function pickQuoteIndex(count: number, previous: number | null, random = Math.random): number {
+  if (count <= 1) return 0;
+  if (previous === null || previous < 0 || previous >= count) return Math.floor(random() * count);
+  // Draw from the other count-1 slots, then skip over the one we're avoiding.
+  const index = Math.floor(random() * (count - 1));
+  return index >= previous ? index + 1 : index;
 }
