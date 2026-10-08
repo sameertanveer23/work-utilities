@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A personal collection of web-based developer utilities — "designed to get the job done with minimal clicks". Angular 21 SPA, dark-first, Angular Material (M3), no backend. Everything runs client-side.
+A personal collection of web-based developer utilities — "designed to get the job done with minimal clicks". Angular 21 SPA, dark-first, Angular Material (M3), no backend. Everything runs client-side. The one network call is the welcome page's news card ([news.service.ts](src/app/features/welcome/news.service.ts) → Hacker News via Algolia); it is cached for 30 minutes, falls back to the last good list, and the page works without it. Don't add others without a similar fallback.
 
 Before August 2026 this was a vanilla HTML/JS single page; that version is in git history and none of it survives in the working tree.
 

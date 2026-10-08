@@ -100,20 +100,55 @@ nav {
   margin-top: 14px;
 }
 
+// A button so the whole header row is the click target and it is keyboard-reachable.
 .group-label {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
   padding: 6px 16px;
+  border: 0;
+  background: transparent;
+  font: inherit;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-align: left;
   color: var(--mat-sys-on-surface-variant);
-  opacity: 0.75;
+  cursor: pointer;
 
   app-icon {
     font-size: 15px;
+    opacity: 0.75;
+  }
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    color: var(--mat-sys-on-surface);
+
+    app-icon {
+      opacity: 1;
+    }
+  }
+
+  // While filtering every group is forced open, so folding does nothing.
+  &:disabled {
+    cursor: default;
+
+    .chevron {
+      visibility: hidden;
+    }
+  }
+
+  .chevron {
+    margin-left: auto;
+    font-size: 18px;
+    transition: transform 0.15s ease;
+
+    &.folded {
+      transform: rotate(-90deg);
+    }
   }
 }
 

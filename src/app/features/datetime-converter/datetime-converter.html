@@ -1,0 +1,59 @@
+<app-utility-page utilityId="datetime-converter">
+  <form class="grid" [formGroup]="form">
+    <app-panel heading="Input" icon="edit_note" [hasFooter]="true">
+      <mat-form-field appearance="outline">
+        <mat-label>Date and time</mat-label>
+        <input matInput formControlName="input" spellcheck="false" placeholder="2026-07-01 14:30" />
+        <mat-hint>YYYY-MM-DD HH:mm[:ss], an epoch, or a date ending in Z / an offset.</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>This time is in</mat-label>
+        <mat-select formControlName="zone">
+          @for (zone of zones; track zone.id) {
+            <mat-option [value]="zone.id">{{ zone.label }} - {{ zone.fullName }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>Ignored when the text has Z or an offset, or is an epoch.</mat-hint>
+      </mat-form-field>
+
+      <p class="note">
+        EST, CST and PST are fixed offsets (UTC-5, -6, -8). Pacific follows daylight saving.
+      </p>
+
+      <div panel-footer>
+        <button matButton="filled" type="button" (click)="useNow()">
+          <app-icon matButtonIcon name="schedule" />
+          Now
+        </button>
+        <app-copy-button [text]="allText()" [key]="copyAllKey" label="Copy all" />
+      </div>
+    </app-panel>
+
+    <app-panel heading="Converted" icon="public">
+      @if (parsed().error) {
+        <div class="error">
+          <app-icon name="error" />
+          <p>{{ parsed().error }}</p>
+        </div>
+      } @else if (rows().length) {
+        <dl>
+          @for (row of rows(); track row.key) {
+            <div class="row" [class.source]="row.isSource">
+              <dt [matTooltip]="row.fullName">{{ row.label }}</dt>
+              <dd>
+                <span class="value">
+                  {{ row.value }}
+                  <small>{{ row.detail }}</small>
+                </span>
+                <app-copy-button variant="icon" [text]="row.value" [key]="'dt-' + row.key" />
+              </dd>
+            </div>
+          }
+        </dl>
+      } @else {
+        <p class="hint">Enter a date and time to see it in every zone.</p>
+      }
+    </app-panel>
+  </form>
+</app-utility-page>

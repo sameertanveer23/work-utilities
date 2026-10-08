@@ -1,43 +1,33 @@
 <section class="hero">
-  <h1>Dev Utilities</h1>
-  <p>Small tools, minimal clicks. Press <kbd>Ctrl</kbd> <kbd>K</kbd> to jump straight to one.</p>
+  <div class="greeting">
+    <h1>{{ greeting }}</h1>
+    <p>{{ today }}</p>
+  </div>
   <button matButton="filled" type="button" (click)="palette.toggle()">
     <app-icon matButtonIcon name="search" />
     Search utilities
+    <kbd>Ctrl K</kbd>
   </button>
 </section>
 
-<section class="about">
-  <p class="lede">
-    A personal toolbox for the small, repetitive jobs that interrupt real work — pasting a list of
-    IDs into a SQL query, naming a branch, decoding a token, recoloring an icon. Each tool does one
-    thing, updates as you type, and puts the result one click from your clipboard.
-  </p>
-
-  <ul class="points">
-    <li>
-      <app-icon name="bolt" />
-      <div>
-        <strong>Keyboard first</strong>
-        <span><kbd>Ctrl</kbd><kbd>K</kbd> to switch tools, <kbd>Ctrl</kbd><kbd>Enter</kbd> to copy.</span>
-      </div>
-    </li>
-    <li>
-      <app-icon name="lock" />
-      <div>
-        <strong>Nothing leaves your browser</strong>
-        <span>No backend, no analytics, no network calls. It works offline.</span>
-      </div>
-    </li>
-    <li>
-      <app-icon name="link" />
-      <div>
-        <strong>Bookmarkable</strong>
-        <span>Every tool has its own URL. Star the ones you live in.</span>
-      </div>
-    </li>
-  </ul>
+<section class="feeds">
+  <app-news-card />
+  <app-quote-card />
 </section>
+
+@if (recents().length > 0) {
+  <section>
+    <h2><app-icon name="history" /> Recent</h2>
+    <div class="pills">
+      @for (utility of recents(); track utility.id) {
+        <a class="pill" [routerLink]="utility.path">
+          <app-icon [name]="utility.icon" />
+          {{ utility.shortTitle }}
+        </a>
+      }
+    </div>
+  </section>
+}
 
 @if (favorites().length > 0) {
   <section>
@@ -48,20 +38,6 @@
           <app-icon class="lead" [name]="utility.icon" />
           <span class="title">{{ utility.title }}</span>
           <span class="desc">{{ utility.description }}</span>
-        </a>
-      }
-    </div>
-  </section>
-}
-
-@if (recents().length > 0) {
-  <section>
-    <h2><app-icon name="history" /> Recent</h2>
-    <div class="pills">
-      @for (utility of recents(); track utility.id) {
-        <a class="pill" [routerLink]="utility.path">
-          <app-icon [name]="utility.icon" />
-          {{ utility.shortTitle }}
         </a>
       }
     </div>

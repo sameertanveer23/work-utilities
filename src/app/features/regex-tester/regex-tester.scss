@@ -1,0 +1,74 @@
+@use '../../shared/utility-layout' as layout;
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wu-gap);
+}
+
+.grid {
+  @include layout.two-panel;
+}
+
+.pattern-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 14px;
+
+  .pattern {
+    flex: 1;
+    min-width: 260px;
+    font-family: var(--wu-mono);
+  }
+
+  mat-button-toggle-group {
+    // Lines the toggles up with the input box rather than the label above it.
+    margin-top: 8px;
+  }
+}
+
+.slash {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.hint {
+  @include layout.hint;
+}
+
+// No whitespace is allowed between the spans: this block is `pre-wrap`, so any
+// stray space would show up as a character in the test text.
+.highlight {
+  margin: 0;
+  padding: 12px 14px;
+  max-height: 320px;
+  overflow: auto;
+  background: var(--wu-code-bg);
+  color: var(--wu-code-fg);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--wu-radius-sm);
+  font-family: var(--wu-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  .hit {
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--mat-sys-primary) 40%, transparent);
+    outline: 1px solid color-mix(in srgb, var(--mat-sys-primary) 70%, transparent);
+
+    &.odd {
+      background: color-mix(in srgb, var(--wu-warn) 40%, transparent);
+      outline-color: color-mix(in srgb, var(--wu-warn) 70%, transparent);
+    }
+  }
+}
+
+[panel-footer] {
+  @include layout.footer-actions;
+}
+
+.shortcut {
+  @include layout.shortcut;
+}

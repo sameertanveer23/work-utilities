@@ -1,0 +1,133 @@
+<app-utility-page utilityId="diff-checker">
+  <form class="stack" [formGroup]="form">
+    <div class="grid">
+      <app-panel heading="Original" icon="remove_circle_outline">
+        <mat-form-field appearance="outline">
+          <mat-label>Original text</mat-label>
+          <textarea matInput formControlName="original" rows="12" spellcheck="false"></textarea>
+        </mat-form-field>
+      </app-panel>
+
+      <app-panel heading="Modified" icon="add_circle_outline">
+        <mat-form-field appearance="outline">
+          <mat-label>Modified text</mat-label>
+          <textarea matInput formControlName="modified" rows="12" spellcheck="false"></textarea>
+        </mat-form-field>
+      </app-panel>
+    </div>
+
+    <app-panel heading="Differences" icon="difference" [hasFooter]="true">
+      <div class="options">
+        <mat-slide-toggle formControlName="ignoreWhitespace">Ignore whitespace</mat-slide-toggle>
+        <mat-slide-toggle formControlName="ignoreCase">Ignore case</mat-slide-toggle>
+        <mat-form-field appearance="outline" class="select">
+          <mat-label>View</mat-label>
+          <mat-select formControlName="view">
+            <mat-option value="split">Side by side</mat-option>
+            <mat-option value="unified">Unified</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="select">
+          <mat-label>Show</mat-label>
+          <mat-select formControlName="context">
+            <mat-option value="all">All lines</mat-option>
+            <mat-option value="3">Changes + 3 lines</mat-option>
+            <mat-option value="0">Changes only</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      @if (!hasInput()) {
+        <p class="hint">Paste text into both boxes to compare them.</p>
+      } @else if (diff().identical) {
+        <p class="hint identical">
+          <app-icon name="check_circle" />
+          The two texts are identical.
+        </p>
+      } @else {
+        <ng-template #lineText let-row let-text="text">
+          @if (row.segments; as segments) {
+            @for (segment of segments; track $index) {
+              <!-- Text sits flush against its tags: the cells are pre-wrap, so template whitespace would render. -->
+              @if (segment.changed) {
+                <mark>{{ segment.text }}</mark>
+              } @else {
+                <span>{{ segment.text }}</span>
+              }
+            }
+          } @else {
+            <span>{{ text }}</span>
+          }
+        </ng-template>
+
+        @if (isSplit()) {
+          <div class="diff split" role="table" aria-label="Side-by-side differences">
+            @for (row of splitRows(); track $index) {
+              @if (row.kind === 'gap') {
+                <div class="row gap" role="row">
+                  <span class="text">{{ row.hidden }} unchanged lines hidden</span>
+                </div>
+              } @else {
+                <div class="row" role="row">
+                  <span class="num" [class]="row.left?.kind ?? 'empty'">{{ row.left?.oldLine }}</span>
+                  <span class="text" [class]="row.left?.kind ?? 'empty'">
+                    @if (row.left; as left) {
+                      <ng-container
+                        *ngTemplateOutlet="
+                          lineText;
+                          context: { $implicit: left, text: left.originalText ?? left.text }
+                        "
+                      />
+                    }
+                  </span>
+                  <span class="num" [class]="row.right?.kind ?? 'empty'">{{ row.right?.newLine }}</span>
+                  <span class="text" [class]="row.right?.kind ?? 'empty'">
+                    @if (row.right; as right) {
+                      <ng-container
+                        *ngTemplateOutlet="lineText; context: { $implicit: right, text: right.text }"
+                      />
+                    }
+                  </span>
+                </div>
+              }
+            }
+          </div>
+        } @else {
+          <div class="diff unified" role="table" aria-label="Line differences">
+            @for (row of displayRows(); track $index) {
+              @if (row.kind === 'gap') {
+                <div class="row gap" role="row">
+                  <span class="text">{{ row.hidden }} unchanged lines hidden</span>
+                </div>
+              } @else {
+                <div class="row" role="row">
+                  <span class="num" [class]="row.kind">{{ row.oldLine }}</span>
+                  <span class="num" [class]="row.kind">{{ row.newLine }}</span>
+                  <span class="text" [class]="row.kind">
+                    <ng-container
+                      *ngTemplateOutlet="lineText; context: { $implicit: row, text: row.text }"
+                    />
+                  </span>
+                </div>
+              }
+            }
+          </div>
+        }
+        <app-stat-chips [stats]="stats()" />
+      }
+
+      <div panel-footer>
+        <app-copy-button [text]="unifiedText()" [key]="copyKey" label="Copy diff" />
+        <button matButton="outlined" type="button" (click)="swap()">
+          <app-icon matButtonIcon name="swap_horiz" />
+          Swap sides
+        </button>
+        <button matButton type="button" (click)="clear()">
+          <app-icon matButtonIcon name="delete_sweep" />
+          Clear
+        </button>
+        <span class="shortcut">Ctrl+Enter to copy</span>
+      </div>
+    </app-panel>
+  </form>
+</app-utility-page>

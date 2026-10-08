@@ -6,11 +6,20 @@ import { CommandPaletteService } from '../../layout/command-palette/command-pale
 import { CATEGORIES } from '../../core/categories';
 import { UTILITIES } from '../../core/utility-registry';
 import { Icon } from '../../shared/icon/icon';
+import { NewsCard } from './news-card';
+import { QuoteCard } from './quote-card';
+
+function greetingFor(hour: number): string {
+  if (hour < 5) return 'Working late';
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
 
 @Component({
   selector: 'app-welcome',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, MatButtonModule, Icon],
+  imports: [RouterLink, MatButtonModule, Icon, NewsCard, QuoteCard],
   templateUrl: './welcome.html',
   styleUrl: './welcome.scss',
 })
@@ -20,6 +29,10 @@ export class Welcome {
 
   readonly favorites = this.favoritesService.favorites;
   readonly recents = this.favoritesService.recents;
+
+  private readonly now = new Date();
+  readonly greeting = greetingFor(this.now.getHours());
+  readonly today = new Intl.DateTimeFormat(undefined, { dateStyle: 'full' }).format(this.now);
 
   readonly groups = computed(() =>
     CATEGORIES.map((category) => ({

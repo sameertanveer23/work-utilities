@@ -1,4 +1,4 @@
-export type CategoryId = 'sql' | 'dotnet' | 'angular' | 'css' | 'general' | 'snippets';
+export type CategoryId = 'sql' | 'dotnet' | 'angular' | 'css' | 'time' | 'general' | 'snippets';
 
 export interface CategoryDef {
   readonly id: CategoryId;
@@ -13,6 +13,7 @@ export const CATEGORIES: readonly CategoryDef[] = [
   { id: 'dotnet', label: '.NET', icon: 'deployed_code' },
   { id: 'angular', label: 'Angular', icon: 'web' },
   { id: 'css', label: 'CSS', icon: 'palette' },
+  { id: 'time', label: 'Time', icon: 'schedule' },
   { id: 'general', label: 'General', icon: 'handyman' },
   { id: 'snippets', label: 'Code Blocks', icon: 'content_paste' },
 ];

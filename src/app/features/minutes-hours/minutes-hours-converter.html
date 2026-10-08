@@ -1,0 +1,55 @@
+<app-utility-page utilityId="minutes-hours">
+  <div class="wrap">
+    <app-panel heading="Convert" icon="timelapse" [hasFooter]="true">
+      <div class="fields">
+        <mat-form-field appearance="outline">
+          <mat-label>Minutes</mat-label>
+          <input matInput [formControl]="minutes" inputmode="decimal" spellcheck="false" />
+          @if (minutesError()) {
+            <mat-error>{{ minutesError() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <app-icon class="arrows" name="swap_horiz" />
+
+        <mat-form-field appearance="outline">
+          <mat-label>Hours</mat-label>
+          <input
+            matInput
+            [formControl]="hours"
+            inputmode="decimal"
+            spellcheck="false"
+            placeholder="1.5 or 1:30"
+          />
+          @if (hoursError()) {
+            <mat-error>{{ hoursError() }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="presets">
+        @for (preset of presets; track preset) {
+          <button matButton="outlined" type="button" (click)="usePreset(preset)">
+            {{ preset }} min
+          </button>
+        }
+      </div>
+
+      @if (stats().length) {
+        <app-stat-chips [stats]="stats()" />
+      } @else {
+        <p class="hint">Type in either box; the other fills in.</p>
+      }
+
+      <div panel-footer>
+        <app-copy-button [text]="hoursText()" [key]="hoursKey" label="Copy hours" />
+        <app-copy-button [text]="minutesText()" [key]="minutesKey" label="Copy minutes" />
+        <button matButton type="button" (click)="clear()">
+          <app-icon matButtonIcon name="delete_sweep" />
+          Clear
+        </button>
+        <span class="shortcut">Ctrl+Enter copies the result</span>
+      </div>
+    </app-panel>
+  </div>
+</app-utility-page>

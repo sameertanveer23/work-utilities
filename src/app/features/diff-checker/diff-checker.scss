@@ -1,0 +1,125 @@
+@use '../../shared/utility-layout' as layout;
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wu-gap);
+}
+
+.grid {
+  @include layout.two-panel;
+}
+
+.options {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+
+  .select {
+    max-width: 220px;
+  }
+}
+
+.hint {
+  @include layout.hint;
+}
+
+.identical {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--wu-success);
+}
+
+[panel-footer] {
+  @include layout.footer-actions;
+}
+
+.shortcut {
+  @include layout.shortcut;
+}
+
+.diff {
+  max-height: 560px;
+  overflow: auto;
+  background: var(--wu-code-bg);
+  color: var(--wu-code-fg);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--wu-radius-sm);
+  font-family: var(--wu-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.row {
+  display: grid;
+  min-width: fit-content;
+
+  .num,
+  .text {
+    min-width: 0;
+  }
+
+  .num {
+    padding: 0 8px;
+    text-align: right;
+    user-select: none;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .text {
+    padding: 0 14px 0 8px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .add {
+    background: color-mix(in srgb, var(--wu-success) 14%, transparent);
+
+    mark {
+      background: color-mix(in srgb, var(--wu-success) 38%, transparent);
+    }
+  }
+
+  .remove {
+    background: color-mix(in srgb, var(--mat-sys-error) 14%, transparent);
+
+    mark {
+      background: color-mix(in srgb, var(--mat-sys-error) 38%, transparent);
+    }
+  }
+
+  // Filler opposite an unmatched line, so the two columns stay aligned.
+  .empty {
+    background: color-mix(in srgb, var(--mat-sys-on-surface) 5%, transparent);
+  }
+
+  &.gap {
+    display: block;
+    padding: 2px 12px;
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface-variant);
+    font-style: italic;
+  }
+
+  mark {
+    color: inherit;
+    border-radius: 2px;
+  }
+}
+
+.split .row {
+  grid-template-columns: 44px minmax(0, 1fr) 44px minmax(0, 1fr);
+  min-width: 640px;
+
+  // Divider between the two halves.
+  > :nth-child(3) {
+    border-left: 1px solid var(--mat-sys-outline-variant);
+  }
+}
+
+.unified .row {
+  grid-template-columns: 44px 44px minmax(0, 1fr);
+}

@@ -1,11 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FavoritesService } from '../../core/services/favorites.service';
+import { readStored, writeStored } from '../../core/services/local-storage';
 import { CATEGORIES, type CategoryDef } from '../../core/categories';
 import { UTILITIES, scoreUtility, type UtilityDef } from '../../core/utility-registry';
 import { Icon } from '../../shared/icon/icon';
+
+const FOLDED_GROUPS_KEY = 'wu.sidebar.folded';
 
 interface CategoryGroup {
   readonly category: CategoryDef;
@@ -44,6 +55,31 @@ export class Sidebar {
   });
 
   readonly noMatches = computed(() => this.filter().length > 0 && this.groups().length === 0);
+
+  /** Ids of the groups the user has folded away; 'favorites' covers the pinned section. */
+  private readonly foldedGroups = signal<ReadonlySet<string>>(
+    new Set(readStored<string[]>(FOLDED_GROUPS_KEY, [])),
+  );
+
+  constructor() {
+    effect(() => writeStored(FOLDED_GROUPS_KEY, [...this.foldedGroups()]));
+  }
+
+  /**
+   * A folded group still opens while filtering (so matches are never hidden)
+   * and in icon-only mode, where there are no headers to fold with.
+   */
+  isOpen(groupId: string): boolean {
+    return this.collapsed() || this.filter().length > 0 || !this.foldedGroups().has(groupId);
+  }
+
+  toggleGroup(groupId: string): void {
+    this.foldedGroups.update((folded) => {
+      const next = new Set(folded);
+      if (!next.delete(groupId)) next.add(groupId);
+      return next;
+    });
+  }
 
   toggleCollapsed(): void {
     this.collapsed.update((c) => !c);

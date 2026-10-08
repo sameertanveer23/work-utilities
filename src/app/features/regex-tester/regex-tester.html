@@ -1,0 +1,59 @@
+<app-utility-page utilityId="regex-tester">
+  <form class="stack" [formGroup]="form">
+    <div class="pattern-row">
+      <mat-form-field appearance="outline" class="pattern">
+        <mat-label>Pattern</mat-label>
+        <span matTextPrefix class="slash">/</span>
+        <input
+          matInput
+          formControlName="pattern"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder="\d+"
+        />
+        <span matTextSuffix class="slash">/</span>
+        @if (result().error) {
+          <mat-error>{{ result().error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-button-toggle-group multiple formControlName="flags" aria-label="Regex flags">
+        @for (def of flagDefs; track def.flag) {
+          <mat-button-toggle [value]="def.flag" [matTooltip]="def.hint">{{ def.flag }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </div>
+
+    <div class="grid">
+      <app-panel heading="Test text" icon="edit_note">
+        <mat-form-field appearance="outline">
+          <mat-label>Text to search</mat-label>
+          <textarea matInput formControlName="text" rows="12" spellcheck="false"></textarea>
+        </mat-form-field>
+      </app-panel>
+
+      <app-panel heading="Matches" icon="manage_search" [hasFooter]="true">
+        @if (!form.controls.pattern.value) {
+          <p class="hint">Enter a pattern to see matches.</p>
+        } @else if (result().error) {
+          <p class="hint">Fix the pattern to see matches.</p>
+        } @else {
+          <pre class="highlight"><!--
+            -->@for (segment of segments(); track $index) {<!--
+              --><span [class.hit]="segment.matched" [class.odd]="segment.odd">{{ segment.text }}</span><!--
+            -->}</pre>
+          <app-stat-chips [stats]="stats()" />
+        }
+
+        <div panel-footer>
+          <app-copy-button [text]="matchesText()" [key]="copyKey" label="Copy matches" />
+          <button matButton type="button" (click)="clear()">
+            <app-icon matButtonIcon name="delete_sweep" />
+            Clear
+          </button>
+          <span class="shortcut">Ctrl+Enter to copy</span>
+        </div>
+      </app-panel>
+    </div>
+  </form>
+</app-utility-page>

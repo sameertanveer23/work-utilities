@@ -125,6 +125,30 @@ export const UTILITIES: readonly UtilityDef[] = [
     loadComponent: () => import('../features/base64-file/base64-file').then((m) => m.Base64File),
   },
   {
+    id: 'diff-checker',
+    path: 'general/diff-checker',
+    title: 'Diff Checker',
+    shortTitle: 'Diff Checker',
+    description: 'Compare two texts line by line, with word-level highlights.',
+    icon: 'difference',
+    category: 'general',
+    keywords: ['diff', 'compare', 'difference', 'text', 'merge', 'changes', 'patch'],
+    loadComponent: () =>
+      import('../features/diff-checker/diff-checker').then((m) => m.DiffChecker),
+  },
+  {
+    id: 'regex-tester',
+    path: 'general/regex-tester',
+    title: 'Regex Tester',
+    shortTitle: 'Regex Tester',
+    description: 'Test a JavaScript regex live, with every match highlighted.',
+    icon: 'regular_expression',
+    category: 'general',
+    keywords: ['regex', 'regexp', 'regular expression', 'pattern', 'match', 'replace', 'groups'],
+    loadComponent: () =>
+      import('../features/regex-tester/regex-tester').then((m) => m.RegexTester),
+  },
+  {
     id: 'encoder',
     path: 'general/encoder',
     title: 'Encode / Decode',
@@ -137,16 +161,59 @@ export const UTILITIES: readonly UtilityDef[] = [
   },
   {
     id: 'timestamp-converter',
-    path: 'general/timestamp',
+    path: 'time/timestamp',
     title: 'Timestamp Converter',
     shortTitle: 'Timestamps',
     description: 'Convert between Unix epoch, ISO 8601 and local time.',
     icon: 'schedule',
-    category: 'general',
+    category: 'time',
     keywords: ['timestamp', 'epoch', 'unix', 'date', 'time', 'iso', 'utc', 'convert'],
     loadComponent: () =>
       import('../features/timestamp-converter/timestamp-converter').then(
         (m) => m.TimestampConverter,
+      ),
+  },
+  {
+    id: 'minutes-hours',
+    path: 'time/minutes-hours',
+    title: 'Minutes ↔ Hours',
+    shortTitle: 'Minutes ↔ Hours',
+    description: 'Convert minutes to hours and back, e.g. 90 min ↔ 1.5 h (1:30).',
+    icon: 'timelapse',
+    category: 'time',
+    keywords: ['minutes', 'hours', 'duration', 'time', 'convert', 'timesheet', 'decimal', 'hh:mm'],
+    loadComponent: () =>
+      import('../features/minutes-hours/minutes-hours-converter').then(
+        (m) => m.MinutesHoursConverter,
+      ),
+  },
+  {
+    id: 'datetime-converter',
+    path: 'time/datetime-converter',
+    title: 'Date-Time Converter',
+    shortTitle: 'Date-Time Zones',
+    description: 'See one date and time in UTC, EST, CST, PST and Pacific at once.',
+    icon: 'public',
+    category: 'time',
+    keywords: [
+      'date',
+      'time',
+      'timezone',
+      'zone',
+      'utc',
+      'cst',
+      'est',
+      'pst',
+      'pdt',
+      'pacific',
+      'central',
+      'eastern',
+      'dst',
+      'convert',
+    ],
+    loadComponent: () =>
+      import('../features/datetime-converter/datetime-converter').then(
+        (m) => m.DatetimeConverter,
       ),
   },
   {

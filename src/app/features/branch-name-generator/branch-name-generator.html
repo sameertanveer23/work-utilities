@@ -46,12 +46,7 @@
 
       <div panel-footer>
         <app-copy-button [text]="branchName()" [key]="branchKey" label="Copy name" />
-        <app-copy-button
-          [text]="checkoutCommand()"
-          [key]="checkoutKey"
-          label="Copy git checkout"
-        />
-        <span class="shortcut">Ctrl + Enter to copy</span>
+        <app-copy-button [text]="checkoutCommand()" [key]="checkoutKey" label="Copy git checkout" />
       </div>
     </app-panel>
   </form>

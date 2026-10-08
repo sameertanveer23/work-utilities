@@ -37,55 +37,75 @@
 
 <nav>
   @if (favorites().length > 0 && !filter()) {
+    @let favoritesOpen = isOpen('favorites');
     <div class="group">
       @if (!collapsed()) {
-        <div class="group-label">
+        <button
+          type="button"
+          class="group-label"
+          [attr.aria-expanded]="favoritesOpen"
+          [disabled]="filter().length > 0"
+          (click)="toggleGroup('favorites')"
+        >
           <app-icon name="star" />
           <span>Favorites</span>
-        </div>
+          <app-icon class="chevron" [class.folded]="!favoritesOpen" name="expand_more" />
+        </button>
       }
-      @for (utility of favorites(); track utility.id) {
-        <a
-          class="item"
-          [routerLink]="utility.path"
-          routerLinkActive="active"
-          [matTooltip]="collapsed() ? utility.shortTitle : ''"
-          matTooltipPosition="right"
-          (click)="navigated.emit()"
-        >
-          <app-icon [name]="utility.icon" />
-          @if (!collapsed()) {
-            <span class="label">{{ utility.shortTitle }}</span>
-          }
-        </a>
+      @if (favoritesOpen) {
+        @for (utility of favorites(); track utility.id) {
+          <a
+            class="item"
+            [routerLink]="utility.path"
+            routerLinkActive="active"
+            [matTooltip]="collapsed() ? utility.shortTitle : ''"
+            matTooltipPosition="right"
+            (click)="navigated.emit()"
+          >
+            <app-icon [name]="utility.icon" />
+            @if (!collapsed()) {
+              <span class="label">{{ utility.shortTitle }}</span>
+            }
+          </a>
+        }
       }
     </div>
   }
 
   @for (group of groups(); track group.category.id) {
+    @let open = isOpen(group.category.id);
     <div class="group">
       @if (!collapsed()) {
-        <div class="group-label">
+        <button
+          type="button"
+          class="group-label"
+          [attr.aria-expanded]="open"
+          [disabled]="filter().length > 0"
+          (click)="toggleGroup(group.category.id)"
+        >
           <app-icon [name]="group.category.icon" />
           <span>{{ group.category.label }}</span>
-        </div>
+          <app-icon class="chevron" [class.folded]="!open" name="expand_more" />
+        </button>
       } @else {
         <div class="group-divider"></div>
       }
-      @for (utility of group.utilities; track utility.id) {
-        <a
-          class="item"
-          [routerLink]="utility.path"
-          routerLinkActive="active"
-          [matTooltip]="collapsed() ? utility.shortTitle : ''"
-          matTooltipPosition="right"
-          (click)="navigated.emit()"
-        >
-          <app-icon [name]="utility.icon" />
-          @if (!collapsed()) {
-            <span class="label">{{ utility.shortTitle }}</span>
-          }
-        </a>
+      @if (open) {
+        @for (utility of group.utilities; track utility.id) {
+          <a
+            class="item"
+            [routerLink]="utility.path"
+            routerLinkActive="active"
+            [matTooltip]="collapsed() ? utility.shortTitle : ''"
+            matTooltipPosition="right"
+            (click)="navigated.emit()"
+          >
+            <app-icon [name]="utility.icon" />
+            @if (!collapsed()) {
+              <span class="label">{{ utility.shortTitle }}</span>
+            }
+          </a>
+        }
       }
     </div>
   }

@@ -1,0 +1,62 @@
+<app-panel heading="Tech news today" icon="newspaper">
+  <button
+    panel-actions
+    matIconButton
+    type="button"
+    class="refresh"
+    [class.spinning]="news.refreshing()"
+    [disabled]="news.refreshing()"
+    matTooltip="Refresh"
+    aria-label="Refresh news"
+    (click)="refresh()"
+  >
+    <app-icon name="refresh" />
+  </button>
+
+  @let state = news.state();
+  @if (state.status === 'ready') {
+    <ol class="stories">
+      @for (article of state.articles; track article.id; let i = $index) {
+        <li>
+          <span class="rank">{{ i + 1 }}</span>
+          <div class="story">
+            <a class="title" [href]="article.url" target="_blank" rel="noopener noreferrer">
+              {{ article.title }}
+            </a>
+            <span class="meta">
+              {{ displayHost(article) }} ·
+              {{ article.points }} points ·
+              <a [href]="article.discussionUrl" target="_blank" rel="noopener noreferrer">
+                {{ article.comments }} comments
+              </a>
+            </span>
+          </div>
+        </li>
+      }
+    </ol>
+    <p class="source">
+      @if (state.stale) {
+        Couldn't reach Hacker News; showing the last stories loaded.
+      } @else {
+        Most upvoted in the last 24 hours, via Hacker News.
+      }
+    </p>
+  } @else if (state.status === 'loading') {
+    <ol class="stories" aria-busy="true">
+      @for (n of placeholders; track n) {
+        <li>
+          <span class="rank">{{ n + 1 }}</span>
+          <div class="story">
+            <span class="skeleton wide"></span>
+            <span class="skeleton narrow"></span>
+          </div>
+        </li>
+      }
+    </ol>
+  } @else {
+    <p class="error">
+      <app-icon name="cloud_off" />
+      Couldn't load the news. Check your connection and try refreshing.
+    </p>
+  }
+</app-panel>
