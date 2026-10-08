@@ -21,13 +21,19 @@ export const QUOTES: readonly Quote[] = [
     text: 'There are only two hard things in Computer Science: cache invalidation and naming things.',
     author: 'Phil Karlton',
   },
-  { text: 'Controlling complexity is the essence of computer programming.', author: 'Brian Kernighan' },
+  {
+    text: 'Controlling complexity is the essence of computer programming.',
+    author: 'Brian Kernighan',
+  },
   {
     text: 'Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.',
     author: 'Antoine de Saint-Exupéry',
   },
   { text: 'The best way to predict the future is to invent it.', author: 'Alan Kay' },
-  { text: 'Simple things should be simple, complex things should be possible.', author: 'Alan Kay' },
+  {
+    text: 'Simple things should be simple, complex things should be possible.',
+    author: 'Alan Kay',
+  },
   { text: 'Code is like humor. When you have to explain it, it’s bad.', author: 'Cory House' },
   { text: 'Before software can be reusable it first has to be usable.', author: 'Ralph Johnson' },
   { text: 'Plan to throw one away; you will, anyhow.', author: 'Fred Brooks' },
@@ -46,6 +52,51 @@ export const QUOTES: readonly Quote[] = [
     author: 'Edward V. Berard',
   },
   { text: 'Software is eating the world.', author: 'Marc Andreessen' },
+  { text: 'The fuck are you doing? Aren`t you suppose to work?', author: 'Sameer Tanveer' },
+  {
+    text: 'It works on my machine.',
+    author: 'The Developer Who Broke Production',
+  },
+  {
+    text: '99 little bugs in the code, 99 little bugs. Take one down, patch it around, 127 little bugs in the code.',
+    author: 'Every Developer Ever',
+  },
+  {
+    text: 'My code doesn’t have bugs. It develops random features.',
+    author: 'Optimistic Developer',
+  },
+  {
+    text: 'There are only two hard things in programming: cache invalidation, naming things, and off-by-one errors.',
+    author: 'Anonymous',
+  },
+  {
+    text: 'Why did the developer go broke? Because he used up all his cache.',
+    author: 'Dad Joke.exe',
+  },
+  {
+    text: 'The best way to learn a new framework is to build something and regret your architecture later.',
+    author: 'Every Senior Developer',
+  },
+  {
+    text: 'Behind every successful developer is a search history they hope nobody sees.',
+    author: 'Anonymous',
+  },
+  {
+    text: 'The code you write today is the legacy code you’ll complain about next year.',
+    author: 'Future You',
+  },
+  {
+    text: 'Stay curious. The moment you think you know everything, JavaScript releases another feature.',
+    author: 'Frontend Developer',
+  },
+  {
+    text: 'A good developer solves problems. A great developer prevents tomorrow’s problems.',
+    author: 'Engineering Wisdom',
+  },
+  {
+    text: 'No matter what you do..AI will take your job one day.',
+    author: 'The Harsh truth',
+  },
 ];
 
 /**
@@ -53,9 +104,7 @@ export const QUOTES: readonly Quote[] = [
  * local midnight rather than at UTC midnight.
  */
 export function localDayNumber(date: Date): number {
-  return Math.floor(
-    (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())) / 86_400_000,
-  );
+  return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000);
 }
 
 /** The same quote all day; `offset` steps through the list for "another one". */
