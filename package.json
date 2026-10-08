@@ -4,9 +4,10 @@
   "scripts": {
     "ng": "ng",
     "snippets": "node scripts/generate-snippet-index.mjs",
-    "prestart": "npm run snippets",
+    "icons": "node scripts/build-icon-font.mjs",
+    "prestart": "npm run snippets && npm run icons",
     "start": "ng serve",
-    "prebuild": "npm run snippets",
+    "prebuild": "npm run snippets && npm run icons",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -44,7 +45,9 @@
     "@angular/build": "^21.0.0",
     "@angular/cli": "^21.0.0",
     "@angular/compiler-cli": "^21.0.0",
+    "fontkit": "^2.0.4",
     "jsdom": "^27.1.0",
+    "subset-font": "^2.9.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }

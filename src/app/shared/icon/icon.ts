@@ -13,9 +13,6 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     span {
       font-size: inherit;
     }
-    :host([filled]) span {
-      font-variation-settings: 'FILL' 1;
-    }
   `,
 })
 export class Icon {

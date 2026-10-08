@@ -87,4 +87,19 @@ Material 3 via `mat.theme()` in [src/styles.scss](src/styles.scss), which emits 
 
 Use `var(--mat-sys-*)` system tokens for colors, plus the app-level `--wu-*` tokens (radius, gap, mono font, code colors) defined at the top of `styles.scss`. Don't hardcode hex values — the old stylesheet did, and removing that is exactly what this rewrite was for.
 
-Fonts (Roboto, Material Symbols) are self-hosted through the `styles` array in [angular.json](angular.json). There are no CDN dependencies; the app works offline.
+Roboto (latin subset only) is self-hosted through the `styles` array in [angular.json](angular.json). There are no CDN dependencies for fonts; the app works offline.
+
+### Icon font
+
+The full Material Symbols font is ~3.9 MB, so the app ships a **generated subset** instead: [src/assets/fonts/material-symbols-subset.woff2](src/assets/fonts/material-symbols-subset.woff2) (~10 kB), declared by the `@font-face` in [src/styles.scss](src/styles.scss). [scripts/build-icon-font.mjs](scripts/build-icon-font.mjs) builds it from every quoted word in `src/**/*.{ts,html}` that the font turns into an icon, and runs on `prestart`/`prebuild` (or `npm run icons`). The output is committed.
+
+- **Adding an icon needs no extra step** - use it in a template or registry entry and the next `npm start`/`npm run build` picks it up. Restart `ng serve` after adding one.
+- A misspelled icon in `icon: '...'` or `<app-icon name="...">` fails the script rather than rendering as plain text.
+- Axes are pinned to FILL 0 / wght 400 / GRAD 0 / opsz 24, so the `filled` variant does not exist. Don't reintroduce `font-variation-settings` for it without un-pinning in the script.
+- Never name an icon dynamically (`'arrow_' + dir`): the scan only sees whole quoted words.
+
+### Deployment
+
+Hosted on Vercel. [vercel.json](vercel.json) gives hashed assets a one-year `immutable` cache and rewrites unknown paths to `index.html` for deep links. The project's Output Directory must be `dist/work-utilities/browser` and its build command `npm run build` (so the snippet and icon generators run).
+
+Routes are already lazy (`loadComponent` per registry entry), and the command palette's dialog is imported on first Ctrl+K - keep `MatDialog`/`CommandPalette` out of static imports in the shell.
