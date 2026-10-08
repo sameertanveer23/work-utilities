@@ -1,0 +1,92 @@
+<app-utility-page utilityId="json-table">
+  <form class="stack" [formGroup]="form">
+    <app-panel heading="JSON" icon="edit_note">
+      <mat-form-field appearance="outline">
+        <mat-label>One array, or several objects pasted one after another</mat-label>
+        <textarea
+          matInput
+          formControlName="raw"
+          rows="8"
+          spellcheck="false"
+          placeholder='[{ "id": 1, "name": "a" }, { "id": 2, "name": "b" }]'
+        ></textarea>
+        @if (parsed().error) {
+          <mat-error>{{ parsed().error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="options">
+        <mat-slide-toggle formControlName="flatten">Flatten nested keys</mat-slide-toggle>
+        <mat-slide-toggle formControlName="onlyDiffering">Only columns that differ</mat-slide-toggle>
+      </div>
+    </app-panel>
+
+    <app-panel heading="Table" icon="table_chart" [hasFooter]="true">
+      @if (parsed().error) {
+        <p class="hint">Fix the JSON to see the table.</p>
+      } @else if (parsed().rows.length === 0) {
+        <p class="hint">
+          Paste an array, or several JSON objects with the same keys, to compare them as a table.
+        </p>
+      } @else {
+        <mat-form-field appearance="outline" class="filter">
+          <mat-label>Filter rows</mat-label>
+          <input matInput formControlName="filter" spellcheck="false" autocomplete="off" />
+        </mat-form-field>
+
+        @if (columns().length === 0) {
+          <p class="hint">Every row has the same values in every column.</p>
+        } @else {
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th class="index">#</th>
+                  @for (column of columns(); track column) {
+                    <th [attr.aria-sort]="ariaSort(column)" [class.varies]="differing().has(column)">
+                      <button type="button" (click)="toggleSort(column)">
+                        <span class="name">{{ column }}</span>
+                        @if (sortIcon(column); as icon) {
+                          <app-icon [name]="icon" />
+                        }
+                      </button>
+                    </th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (cells of views(); track $index; let i = $index) {
+                  <tr>
+                    <td class="index">{{ i + 1 }}</td>
+                    @for (cell of cells; track $index) {
+                      <td [class]="cell.kind" [attr.title]="cell.text.length > 60 ? cell.text : null">{{ cell.text }}</td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (hiddenRows() > 0) {
+            <p class="more">
+              Showing the first {{ maxRows }} rows; copy and download include all {{ maxRows + hiddenRows() }}.
+            </p>
+          }
+        }
+        <app-stat-chips [stats]="stats()" />
+      }
+
+      <div panel-footer>
+        <app-copy-button [text]="tsv()" [key]="copyKey" label="Copy for Excel" />
+        <button matButton="outlined" type="button" [disabled]="!tsv()" (click)="downloadCsv()">
+          <app-icon matButtonIcon name="download" />
+          Download CSV
+        </button>
+        <button matButton type="button" (click)="clear()">
+          <app-icon matButtonIcon name="delete_sweep" />
+          Clear
+        </button>
+        <span class="shortcut">Ctrl+Enter to copy</span>
+      </div>
+    </app-panel>
+  </form>
+</app-utility-page>

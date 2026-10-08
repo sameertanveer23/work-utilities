@@ -101,6 +101,18 @@ export const UTILITIES: readonly UtilityDef[] = [
       import('../features/json-formatter/json-formatter').then((m) => m.JsonFormatter),
   },
   {
+    id: 'json-table',
+    path: 'general/json-table',
+    title: 'JSON Table Viewer',
+    shortTitle: 'JSON Table',
+    description: 'Compare several JSON objects with the same keys side by side as a table.',
+    icon: 'table_chart',
+    category: 'general',
+    keywords: ['json', 'table', 'compare', 'rows', 'columns', 'csv', 'excel', 'array', 'grid', 'diff'],
+    loadComponent: () =>
+      import('../features/json-table/json-table-viewer').then((m) => m.JsonTableViewer),
+  },
+  {
     id: 'base64-file',
     path: 'general/base64-file',
     title: 'Base64 ↔ File',
